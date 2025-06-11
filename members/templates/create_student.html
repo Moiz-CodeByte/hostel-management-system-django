@@ -2,25 +2,35 @@
 
 {% block content %}
 <h2>Add New Student</h2>
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
 <form method="POST" action="{% url 'create_student' %}">
     {% csrf_token %}
-    <div>
+    <div class="form-group">
         <label for="studentName">Name</label>
         <input type="text" id="studentName" name="name" required>
     </div>
-    <div>
+    
+    <div class="form-group">
         <label for="studentEmail">Email</label>
         <input type="email" id="studentEmail" name="email" required>
     </div>
-    <div>
+    
+    <div class="form-group">
         <label for="studentPhone">Phone Number</label>
         <input type="text" id="studentPhone" name="phone_number" required>
     </div>
    
-    <div>
-        <label for="room">Room</label>
-    
-            <select name="room" required>
+    <div class="form-group">
+        <label for="room">Room Assignment</label>
+        <select name="room" id="room" required>
             {% for room in rooms %}
                 {% if room.remaining_capacity <= 0 %}
                     <option value="{{ room.id }}" disabled style="color: grey;">
@@ -33,17 +43,11 @@
                 {% endif %}
             {% endfor %}
         </select>
-
     </div>
     
+    <input type="hidden" name="is_active" value="True">
     
-    <div>
-        <label for="is_active">Is Active?</label>
-        <select name="is_active" id="is_active">
-            <option value="True" selected>Yes</option>
-            <option value="False">No</option>
-        </select>
-    </div>
-    <button type="submit">Add Student</button>
+    <button type="submit" class="btn">Add Student</button>
+    <a href="{% url 'manage_students' %}" class="btn btn-secondary">Back</a>
 </form>
 {% endblock %}

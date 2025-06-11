@@ -1,101 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Edit Hostel - Admin</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f7f9fc;
-            margin: 0; padding: 0;
-            color: #333;
-        }
-        .container {
-            max-width: 600px;
-            margin: 3rem auto;
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
-        }
-        h2 {
-            text-align: center;
-            color: #2a3f54;
-        }
-        form div {
-            margin-bottom: 1.25rem;
-        }
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        input[type="text"], input[type="number"], select {
-            width: 100%;
-            padding: 0.5rem 0.75rem;
-            border: 1.5px solid #ccc;
-            border-radius: 6px;
-        }
-        button[type="submit"] {
-            width: 100%;
-            padding: 0.75rem;
-            background-color: #2a3f54;
-            border: none;
-            border-radius: 25px;
-            color: white;
-            font-size: 1.1rem;
-            cursor: pointer;
-        }
-        @media (max-width: 480px) {
-            .container {
-                margin: 1rem;
-                padding: 1.25rem;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Edit Hostel</h2>
-        <form method="POST" action="{% url 'edit_hostel' hostel.id %}">
-            {% csrf_token %}
-            <div>
-                <label for="hostelName">Hostel Name</label>
-                <input type="text" id="hostelName" name="name" value="{{ hostel.name }}" required />
-            </div>
-            <div>
-                <label for="hostelLocation">Location</label>
-                <select id="hostelLocation" name="location" required>
-                    <option value="City1" {% if hostel.location == "City1" %}selected{% endif %}>City1</option>
-                    <option value="City2" {% if hostel.location == "City2" %}selected{% endif %}>City2</option>
-                    <option value="City3" {% if hostel.location == "City3" %}selected{% endif %}>City3</option>
-                </select>
-            </div>
-            <div>
-                <label for="totalRooms">Total Rooms</label>
-                <input type="number" id="totalRooms" name="total_rooms" value="{{ hostel.totaal_rooms }}" required />
-            </div>
+{% extends 'base.html' %}
 
-            <div>
-                <label for="hostelOwner">Owner</label>
-                <select id="hostelOwner" name="owner" required>
-                    {% for owner in hostel_owners %}
-                    <option value="{{ owner.id }}" {% if owner.id == hostel.owner.id %}selected{% endif %}>{{ owner.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+{% block content %}
+<h2>Edit Hostel</h2>
 
-            <div>
-                <label for="hostelActive">Is Active?</label>
-                <select id="hostelActive" name="is_active" required>
-                    <option value="True" {% if hostel.is_active %}selected{% endif %}>Active</option>
-                    <option value="False" {% if not hostel.is_active %}selected{% endif %}>Inactive</option>
-                </select>
-            </div>
-            <button type="submit">Update Hostel</button>
-        </form>
-        <a href="{% url 'manage_hostels' %}">Back to Manage Hostels</a>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<form method="POST" action="{% url 'edit_hostel' hostel.id %}">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="hostelName">Hostel Name</label>
+        <input type="text" id="hostelName" name="name" value="{{ hostel.name }}" required>
     </div>
-</body>
-</html>
+    
+    <div class="form-group">
+        <label for="hostelLocation">Location</label>
+        <select id="hostelLocation" name="location" required>
+            <option value="City1" {% if hostel.location == "City1" %}selected{% endif %}>City1</option>
+            <option value="City2" {% if hostel.location == "City2" %}selected{% endif %}>City2</option>
+            <option value="City3" {% if hostel.location == "City3" %}selected{% endif %}>City3</option>
+        </select>
+    </div>
+    
+    <div class="form-group">
+        <label for="totalRooms">Total Rooms</label>
+        <input type="number" id="totalRooms" name="total_rooms" value="{{ hostel.totaal_rooms }}" min="1" required>
+        <small class="warning">Warning: Reducing the number of rooms may affect existing room assignments.</small>
+    </div>
+
+    <div class="form-group">
+        <label for="hostelOwner">Owner</label>
+        <select id="hostelOwner" name="owner" required>
+            {% for owner in hostel_owners %}
+            <option value="{{ owner.id }}" {% if owner.id == hostel.owner.id %}selected{% endif %}>{{ owner.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <input type="hidden" name="is_active" value="True">
+    
+    <div class="form-actions">
+        <button type="submit" class="btn">Update Hostel</button>
+        <a href="{% url 'manage_hostels' %}" class="btn btn-secondary">Back to Manage Hostels</a>
+    </div>
+</form>
+{% endblock %}

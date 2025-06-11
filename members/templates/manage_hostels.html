@@ -1,158 +1,85 @@
-!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Manage Hostels - Admin</title>
-   
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f7f9fc;
-            margin: 0; padding: 0;
-            color: #333;
-        }
-        .container {
-            max-width: 800px;
-            margin: 3rem auto;
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
-        }
-        h2 {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            color: #2a3f54;
-        }
-        form div {
-            margin-bottom: 1.25rem;
-        }
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        input[type="text"], input[type="number"], select, textarea {
-            width: 100%;
-            padding: 0.5rem 0.75rem;
-            border: 1.5px solid #ccc;
-            border-radius: 6px;
-            font-size: 1rem;
-        }
-        button[type="submit"] {
-            width: 100%;
-            padding: 0.75rem;
-            background-color: #2a3f54;
-            border: none;
-            border-radius: 25px;
-            color: white;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 2rem;
-        }
-        th, td {
-            border: 1px solid #ccc;
-            padding: 0.75rem;
-            text-align: left;
-        }
-        th {
-            background-color: #2a3f54;
-            color: white;
-        }
-        a {
-            color: #2a3f54;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        @media (max-width: 480px) {
-            .container {
-                margin: 1rem;
-                padding: 1.25rem;
-            }
-        }
-    </style>
+{% extends 'base.html' %}
 
-</head>
-<body>
-    <div class="container">
-        <h2>Manage Hostels</h2>
-        <form method="POST" action="{% url 'manage_hostels' %}">
-            {% csrf_token %}
-            <div>
-                <label for="hostelName">Hostel Name</label>
-                <input type="text" id="hostelName" name="name" placeholder="Hostel Name" required />
-            </div>
-            <div>
-                <label for="hostelLocation">Location</label>
-                <select id="hostelLocation" name="location" required>
-                    <option value="City1">City1</option>
-                    <option value="City2">City2</option>
-                    <option value="City3">City3</option>
-                </select>
-            </div>
-            <div>
-                <label for="totalRooms">Total Rooms</label>
-                <input type="number" id="totalRooms" name="total_rooms"  min="1" required />
-            </div>
+{% block content %}
+<h2>Manage Hostels</h2>
 
-            <div>
-                <label for="hostelOwner">Owner</label>
-                <select id="hostelOwner" name="owner" required>
-                    {% for owner in hostel_owners %}
-                    <option value="{{ owner.id }}">{{ owner.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div>
-                <label for="hostelActive">Is Active?</label>
-                <select id="hostelActive" name="is_active" required>
-                    <option value="True" selected>Active</option>
-                    <option value="False">Inactive</option>
-                </select>
-            </div>
-            <button type="submit">Save Hostel</button>
-        </form>
-        <h2>Hostels List</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Location</th>
-                    <th>Total Rooms</th>
-                    <th>Active</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for hostel in hostels %}
-                <tr>
-                    <td>{{ hostel.id }}</td>
-                    <td>{{ hostel.name }}</td>
-                    <td>{{ hostel.location }}</td>
-                    <td>{{ hostel.total_rooms }}</td>
-                    <td>{{ hostel.is_active|yesno:"Yes,No" }}</td>
-                    <td>
-                        <a href="{% url 'edit_hostel' hostel.id %}">Edit</a>
-                        <a href="{% url 'delete_hostel' hostel.id %}">Delete</a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="6">No hostels found.</td>
-                </tr>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<div class="section-container">
+    <h3>Create New Hostel</h3>
+    <form method="POST" action="{% url 'manage_hostels' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="hostelName">Hostel Name</label>
+            <input type="text" id="hostelName" name="name" placeholder="Hostel Name" required>
+        </div>
+        <div class="form-group">
+            <label for="hostelLocation">Location</label>
+            <select id="hostelLocation" name="location" required>
+                <option value="City1">City1</option>
+                <option value="City2">City2</option>
+                <option value="City3">City3</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="totalRooms">Total Rooms</label>
+            <input type="number" id="totalRooms" name="total_rooms" min="1" required>
+        </div>
+
+        <div class="form-group">
+            <label for="hostelOwner">Owner</label>
+            <select id="hostelOwner" name="owner" required>
+                {% for owner in hostel_owners %}
+                <option value="{{ owner.id }}">{{ owner.name }}</option>
                 {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</body>
-</html>
+            </select>
+        </div>
+        
+        <input type="hidden" name="is_active" value="True">
+        
+        <button type="submit" class="btn">Save Hostel</button>
+    </form>
+</div>
+
+<div class="section-container">
+    <h3>Hostels List</h3>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Total Rooms</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for hostel in hostels %}
+            <tr>
+                <td>{{ hostel.id }}</td>
+                <td>{{ hostel.name }}</td>
+                <td>{{ hostel.location }}</td>
+                <td>{{ hostel.total_rooms }}</td>
+                <td>{{ hostel.is_active|yesno:"Yes,No" }}</td>
+                <td>
+                    <a href="{% url 'edit_hostel' hostel.id %}" class="action-link">Edit</a>
+                    <a href="{% url 'delete_hostel' hostel.id %}" class="action-link delete">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">No hostels found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
 

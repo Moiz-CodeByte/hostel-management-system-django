@@ -4,35 +4,93 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hostel Management</title>
     <link rel="stylesheet" href="{% static 'css/user_side.css' %}">
-    
+    <link rel="stylesheet" href="{% static 'css/enhanced_style.css' %}">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
 </head>
 <body>
-   
-
-
-    <nav style="background-color:#2a3f54; padding: 1rem; color: white; display: flex; align-items: center; justify-content: space-between;">
+    <nav>
         <div>
             <strong style="font-size: 1.5rem;">Hostel Management</strong>
-            <a href="{% url 'create_student' %}" style="margin-left: 2rem; color: white;">Add students</a>
-            <a href="{% url 'manage_students' %}" style="margin-left: 2rem; color: white;">Students Records</a>
-            <a href="{% url 'manage_staff' %}" style="margin-left: 1rem; color: white;">Staff Records</a>
-            <a href="{% url 'rent_management' %}" style="margin-left: 1rem; color: white;">Rent Management</a>
+            <a href="{% url 'create_student' %}">Add Students</a>
+            <a href="{% url 'manage_students' %}">Students Records</a>
+            <a href="{% url 'manage_staff' %}">Staff Records</a>
+            <a href="{% url 'rent_management' %}">Rent Management</a>
         </div>
         <div>
-            <a href="{% url 'edit_hostel_user' %}" style="margin-left: 2rem; color: white;">Edit Hostel</a>
+            <a href="{% url 'edit_hostel_user' %}">Edit Hostel</a>
+            <a href="{% url 'about' %}">About</a>
             <a href="{% url 'logout' %}" class="logout-button">Logout</a>
         </div>
     </nav>
-    
 
     <div class="container">
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        
         {% block content %}{% endblock %}
     </div>
 
     <footer style="background-color: #f0f0f0; padding: 1rem; text-align: center; margin-top: 2rem;">
-        &copy; 2025 Hostel Management System. All Rights Reserved.
+        &copy; {% now "Y" %} Hostel Management System. All Rights Reserved.
     </footer>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script>
+        // Function to display Toastify notifications
+        function showCToast(type, message) {
+        /* 
+            type: info, success, error, default;
+            message: message to be displayed.
+            */
+            const colorMap = {
+                "info": '#63B3ED',
+                "success": '#2dce89',
+                "error": '#f5365c',
+                "default": "#20c997"
+            };
+        
+            const color = colorMap[type] || colorMap["default"];
+        
+            // Configure and display the toast notification
+            Toastify({
+                text: message,
+                duration: 3000,
+                className: type,
+                close: true,
+                gravity: "top",       // `top` or `bottom`
+                position: "center",   // `left`, `center` or `right`
+                stopOnFocus: true,    // Prevent dismissing of toast on hover
+                style: {
+                    background: color,
+                },
+                escapeMarkup: false,   // Render HTML tags in the notification
+            }).showToast();
+        }
+        
+        // Extract Django messages and display them using Toastify
+        const customMessages = [
+            {% for message in messages %}
+                {
+                    "tags": "{{ message.tags|default:'' }}",
+                    "message": '{{ message.message|default:'' }}'
+                }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+        
+        // Display each custom message using Toastify
+        customMessages.forEach(message => {
+            showCToast(message.tags, message.message);
+        });
+        </script>
+
+
 </body>
 </html>

@@ -5,7 +5,7 @@ from .views import (
     create_rent, create_student, delete_payment, delete_rent, delete_staff, delete_student, edit_hostel_user, edit_rent, edit_staff, 
     edit_student, logout_view, manage_hostel_owners, edit_hostel_owner, delete_hostel_owner,
     manage_hostels, edit_hostel, delete_hostel, manage_payments, edit_payment, manage_rent,
-    manage_staff, signup, login_view, create_hostel, manage_students,home
+    manage_staff, signup, login_view, create_hostel, manage_students, home, about
 )
 
 
@@ -26,7 +26,8 @@ urlpatterns = [
     path('delete_payment/<int:payment_id>/', delete_payment, name='delete_payment'),
 
     # Auth
-     path('', home, name='home'),
+    path('', home, name='home'),
+    path('about/', about, name='about'),
     path('signup/', signup, name='signup'),
     path('login/', login_view, name='login'),
     path('accounts/login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),  # fallback login

@@ -2,11 +2,25 @@
 
 {% block content %}
 <h2>Delete Staff Member</h2>
-<p>Are you sure you want to delete <strong>{{ staff.name }}</strong> ({{ staff.role }})?</p>
 
-<form method="POST">
-    {% csrf_token %}
-    <button type="submit" style="background-color:red; color:white;">Yes, Delete</button>
-    <a href="{% url 'manage_staff' %}" style="margin-left: 1rem;">Cancel</a>
-</form>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<div class="confirmation-box">
+    <p>Are you sure you want to delete <strong>{{ staff.name }}</strong> ({{ staff.role }})?</p>
+    <p class="warning">This action cannot be undone.</p>
+    
+    <form method="POST">
+        {% csrf_token %}
+        <div class="action-buttons">
+            <button type="submit" class="btn delete-button">Yes, Delete</button>
+            <a href="{% url 'manage_staff' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
 {% endblock %}

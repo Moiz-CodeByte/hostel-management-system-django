@@ -1,60 +1,43 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Hostel</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'css/create_hostels.css' %}">
-</head>
-<body>
+{% extends 'base.html' %}
 
-<div class="container">
-    <h2>Edit Hostel</h2>
+{% block content %}
+<h2>Edit Hostel</h2>
 
-    {% if messages %}
-        <div class="messages">
-            {% for message in messages %}
-                <p>{{ message }}</p>
-            {% endfor %}
-        </div>
-    {% endif %}
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
 
-    <form method="POST" action="{% url 'edit_hostel_user' %}">
-        
+<form method="POST" action="{% url 'edit_hostel_user' %}">
+    {% csrf_token %}
+    
+    <div class="form-group">
+        <label for="hostelName">Hostel Name</label>
+        <input type="text" id="hostelName" name="name" value="{{ hostel.name }}" required>
+    </div>
 
-        {% csrf_token %}
+    <div class="form-group">
+        <label for="hostelLocation">Location</label>
+        <select id="hostelLocation" name="location" required>
+            <option value="" disabled>Select Location</option>
+            <option value="City1" {% if hostel.location == "City1" %}selected{% endif %}>City1</option>
+            <option value="City2" {% if hostel.location == "City2" %}selected{% endif %}>City2</option>
+            <option value="City3" {% if hostel.location == "City3" %}selected{% endif %}>City3</option>
+        </select>
+    </div>
 
-        <div>
-            <label for="hostelName">Hostel Name</label>
-            <input type="text" id="hostelName" name="name" value="{{ hostel.name }}" required />
-        </div>
+    <div class="form-group">
+        <label for="totalRooms">Total Rooms</label>
+        <input type="number" id="totalRooms" name="total_rooms" min="1" value="{{ hostel.total_rooms }}" required>
+        <small class="warning">Warning: Reducing the number of rooms may affect existing room assignments.</small>
+    </div>
 
-        <div>
-            <label for="hostelLocation">Location</label>
-            <select id="hostelLocation" name="location" required>
-                <option value="" disabled>Select Location</option>
-                <option value="City1" {% if hostel.location == "City1" %}selected{% endif %}>City1</option>
-                <option value="City2" {% if hostel.location == "City2" %}selected{% endif %}>City2</option>
-                <option value="City3" {% if hostel.location == "City3" %}selected{% endif %}>City3</option>
-            </select>
-        </div>
+    <input type="hidden" name="is_active" value="True">
 
-        <div>
-            <label for="totalRooms">Total Rooms</label>
-            <input type="number" id="totalRooms" name="total_rooms" min="1" value="{{ hostel.total_rooms }}" required />
-        </div>
-
-        <div>
-            <label for="hostelActive">Is Active?</label>
-            <select id="hostelActive" name="is_active" required>
-                <option value="True" {% if hostel.is_active %}selected{% endif %}>Active</option>
-                <option value="False" {% if not hostel.is_active %}selected{% endif %}>Inactive</option>
-            </select>
-        </div>
-
-        <button type="submit">Update Hostel</button>
-    </form>
-</div>
-
-</body>
-</html>
+    <button type="submit" class="btn">Update Hostel</button>
+    <a href="{% url 'list_hostels_user' %}" class="btn btn-secondary">Back to My Hostels</a>
+</form>
+{% endblock %}

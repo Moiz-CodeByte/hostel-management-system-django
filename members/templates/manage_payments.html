@@ -1,90 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Manage Payments - Admin</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f7f9fc;
-            margin: 0; padding: 0;
-            color: #333;
-        }
-        .container {
-            max-width: 800px;
-            margin: 3rem auto;
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
-        }
-        h2 {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            color: #2a3f54;
-        }
-        form div {
-            margin-bottom: 1.25rem;
-        }
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        input[type="text"], input[type="number"], input[type="date"], input[type="datetime-local"], select, textarea { 
-            width: 100%;
-            padding: 0.5rem 0.75rem;
-            border: 1.5px solid #ccc;
-            border-radius: 6px;
-            font-size: 1rem;
-        }
-        button[type="submit"] {
-            width: 100%;
-            padding: 0.75rem;
-            background-color: #2a3f54;
-            border: none;
-            border-radius: 25px;
-            color: white;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 2rem;
-        }
-        th, td {
-            border: 1px solid #ccc;
-            padding: 0.75rem;
-            text-align: left;
-        }
-        th {
-            background-color: #2a3f54;
-            color: white;
-        }
-        a {
-            color: #2a3f54;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        @media (max-width: 480px) {
-            .container {
-                margin: 1rem;
-                padding: 1.25rem;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Manage Payments</h2>
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Manage Payments</h2>
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<div class="section-container">
         <form method="POST" action="{% url 'manage_payments' %}">
             {% csrf_token %}
-            <div>
+            <div class="form-group">
                 <label for="hostel">Hostel</label>
                 <select id="hostel" name="hostel" required>
                     {% for hostel in hostels %}
@@ -92,29 +22,29 @@
                     {% endfor %}
                 </select>
             </div>
-            <div>
+            <div class="form-group">
                 <label for="amount">Amount</label>
                 <input type="number" id="amount" name="amount" step="0.01" required />
             </div>
-            <div>
+            <div class="form-group">
                 <label for="due_date">Due Date</label>
                 <input type="date" id="due_date" name="due_date" required />
             </div>
-            <div>
+            <div class="form-group">
                 <label for="payment_date">Payment Date (Optional)</label>
                 <input type="datetime-local" id="payment_date" name="payment_date" />
             </div>
-            <div>
-                <label for="is_paid">Is Paid?</label>
+            <div class="form-group">
+                <label for="is_paid">Payment Status</label>
                 <select id="is_paid" name="is_paid" required>
-                    <option value="True">Yes</option>
-                    <option value="False">No</option>
+                    <option value="True">Paid</option>
+                    <option value="False">Unpaid</option>
                 </select>
             </div>
-            <button type="submit">Save Payment</button>
+            <button type="submit" class="btn">Save Payment</button>
         </form>
         <h2>Payment Records</h2>
-        <table>
+        <table class="data-table">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -136,8 +66,8 @@
                     <td>{{ payment.payment_date|default:"Not Paid Yet" }}</td>
                     <td>{{ payment.is_paid|yesno:"Paid,Not Paid" }}</td>
                     <td>
-                        <a href="{% url 'edit_payment' payment.id %}">Edit</a>
-                        <a href="{% url 'delete_payment' payment.id %}">Delete</a>
+                        <a href="{% url 'edit_payment' payment.id %}" class="action-link">Edit</a>
+                        <a href="{% url 'delete_payment' payment.id %}" class="action-link delete">Delete</a>
                     </td>
                 </tr>
                 {% empty %}
@@ -148,5 +78,4 @@
             </tbody>
         </table>
     </div>
-</body>
-</html>
+{% endblock %}

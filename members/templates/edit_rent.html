@@ -2,24 +2,33 @@
 
 {% block content %}
 <h2>Edit Rent Payment</h2>
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
 <form method="POST">
     {% csrf_token %}
-    <div>
+    <div class="form-group">
         <label>Student</label>
         <input type="text" value="{{ rent.student.name }}" disabled>
     </div>
-    <div>
+    <div class="form-group">
         <label for="amount">Amount</label>
-        <input type="number" step="0.01" name="amount" value="{{ rent.amount }}" required>
+        <input type="number" step="0.01" name="amount" id="amount" value="{{ rent.amount }}" required>
     </div>
-    <div>
-        <label for="is_paid">Paid?</label>
-        <select name="is_paid">
-            <option value="True" {% if rent.is_paid %}selected{% endif %}>Yes</option>
-            <option value="False" {% if not rent.is_paid %}selected{% endif %}>No</option>
+    <div class="form-group">
+        <label for="is_paid">Payment Status</label>
+        <select name="is_paid" id="is_paid">
+            <option value="True" {% if rent.is_paid %}selected{% endif %}>Paid</option>
+            <option value="False" {% if not rent.is_paid %}selected{% endif %}>Unpaid</option>
         </select>
     </div>
-    <button type="submit">Update</button>
+    <button type="submit" class="btn">Update Payment</button>
 </form>
-<a href="{% url 'rent_management' %}">Back to Rent List</a>
+<a href="{% url 'rent_management' %}" class="btn btn-secondary">Back to Rent List</a>
 {% endblock %}

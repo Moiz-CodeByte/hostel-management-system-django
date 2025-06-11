@@ -1,167 +1,77 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Manage Hostel Owners - Admin</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f7f9fc;
-            margin: 0; padding: 0;
-            color: #333;
-        }
-        .container {
-            max-width: 800px;
-            margin: 3rem auto;
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.1);
-        }
-        h2 {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            color: #2a3f54;
-        }
-        form div {
-            margin-bottom: 1.25rem;
-        }
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        input[type="text"], input[type="email"], textarea {
-            width: 100%;
-            padding: 0.5rem 0.75rem;
-            border: 1.5px solid #ccc;
-            border-radius: 6px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-            resize: vertical;
-        }
-        input[type="text"]:focus, input[type="email"]:focus, textarea:focus {
-            outline: none;
-            border-color: #2a3f54;
-        }
-        select {
-            width: 100%;
-            padding: 0.5rem 0.75rem;
-            border: 1.5px solid #ccc;
-            border-radius: 6px;
-            font-size: 1rem;
-        }
-        button[type="submit"] {
-            width: 100%;
-            padding: 0.75rem;
-            background-color: #2a3f54;
-            border: none;
-            border-radius: 25px;
-            color: white;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button[type="submit"]:hover {
-            background-color: #1e2f43;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 2rem;
-        }
-        th, td {
-            border: 1px solid #ccc;
-            padding: 0.75rem;
-            text-align: left;
-        }
-        th {
-            background-color: #2a3f54;
-            color: white;
-        }
-        a {
-            color: #2a3f54;
-            text-decoration: none;
-            margin-right: 0.5rem;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        @media (max-width: 480px) {
-            .container {
-                margin: 1rem;
-                padding: 1.25rem;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Manage Hostel Owners</h2>
-        <form method="POST" action="{% url 'manage_hostel_owners' %}">
-            {% csrf_token %}
-            <div>
-                <label for="ownerName">Name</label>
-                <input type="text" id="ownerName" name="name" placeholder="Full Name" required />
-            </div>
-            <div>
-                <label for="ownerEmail">Email</label>
-                <input type="email" id="ownerEmail" name="email" placeholder="example@example.com" required />
-            </div>
-            <div>
-                <label for="ownerPhone">Phone Number</label>
-                <input type="text" id="ownerPhone" name="phone_number" placeholder="Phone Number" required />
-            </div>
-            <div>
-                <label for="ownerAddress">Address</label>
-                <textarea id="ownerAddress" name="address" rows="3" placeholder="Hostel Owner Address" required></textarea>
-            </div>
-            <div>
-                <label for="ownerActive">Is Active?</label>
-                <select id="ownerActive" name="is_active" required>
-                    <option value="True" selected>Active</option>
-                    <option value="False">Inactive</option>
-                </select>
-            </div>
-            <button type="submit">Save Hostel Owner</button>
-        </form>
+{% extends 'base.html' %}
 
-        <h2>Hostel Owners List</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone Number</th>
-                    <th>Address</th>
-                    <th>Active</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for owner in hostel_owners %}
-                <tr>
-                    <td>{{ owner.id }}</td>
-                    <td>{{ owner.name }}</td>
-                    <td>{{ owner.email }}</td>
-                    <td>{{ owner.phone_number }}</td>
-                    <td>{{ owner.address|linebreaksbr }}</td>
-                    <td>{{ owner.is_active|yesno:"Yes,No" }}</td>
-                    <td>
-                        <a href="{% url 'edit_hostel_owner' owner.id %}">Edit</a>
-                        <a href="{% url 'delete_hostel_owner' owner.id %}">Delete</a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="7">No hostel owners found.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</body>
-</html>
+{% block content %}
+<h2>Manage Hostel Owners</h2>
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<div class="section-container">
+    <h3>Create New Hostel Owner</h3>
+    <form method="POST" action="{% url 'manage_hostel_owners' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="ownerName">Name</label>
+            <input type="text" id="ownerName" name="name" placeholder="Full Name" required>
+        </div>
+        <div class="form-group">
+            <label for="ownerEmail">Email</label>
+            <input type="email" id="ownerEmail" name="email" placeholder="example@example.com" required>
+        </div>
+        <div class="form-group">
+            <label for="ownerPhone">Phone Number</label>
+            <input type="text" id="ownerPhone" name="phone_number" placeholder="Phone Number" required>
+        </div>
+        <div class="form-group">
+            <label for="ownerAddress">Address</label>
+            <textarea id="ownerAddress" name="address" rows="3" placeholder="Hostel Owner Address" required></textarea>
+        </div>
+        
+        <input type="hidden" name="is_active" value="True">
+        
+        <button type="submit" class="btn">Save Hostel Owner</button>
+    </form>
+</div>
+
+<div class="section-container">
+    <h3>Hostel Owners List</h3>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone Number</th>
+                <th>Address</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for owner in hostel_owners %}
+            <tr>
+                <td>{{ owner.id }}</td>
+                <td>{{ owner.name }}</td>
+                <td>{{ owner.email }}</td>
+                <td>{{ owner.phone_number }}</td>
+                <td>{{ owner.address|linebreaksbr }}</td>
+                <td>{{ owner.is_active|yesno:"Yes,No" }}</td>
+                <td>
+                    <a href="{% url 'edit_hostel_owner' owner.id %}" class="action-link">Edit</a>
+                    <a href="{% url 'delete_hostel_owner' owner.id %}" class="action-link delete">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">No hostel owners found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

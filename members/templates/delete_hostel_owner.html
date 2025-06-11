@@ -1,82 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Delete Hostel Owner - Admin</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f7f9fc;
-            margin: 0; padding: 0;
-            color: #333;
-        }
-        .container {
-            max-width: 600px;
-            margin: 3rem auto;
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        h2 {
-            color: #d9534f;
-            margin-bottom: 1.5rem;
-        }
-        p {
-            font-size: 1.1rem;
-            margin-bottom: 2rem;
-        }
-        form button {
-            padding: 0.75rem 2rem;
-            background-color: #d9534f;
-            border: none;
-            border-radius: 25px;
-            color: white;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin-right: 1rem;
-        }
-        form button:hover {
-            background-color: #c9302c;
-        }
-        a.back-link {
-            display: inline-block;
-            padding: 0.75rem 2rem;
-            background-color: #2a3f54;
-            color: white;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: background-color 0.3s;
-        }
-        a.back-link:hover {
-            background-color: #1e2f43;
-        }
-        @media (max-width: 480px) {
-            .container {
-                margin: 1rem;
-                padding: 1.25rem;
-            }
-            form button, a.back-link {
-                width: 100%;
-                margin: 0 0 1rem 0;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Confirm Delete</h2>
-        <p>Are you sure you want to delete the hostel owner: <strong>{{ owner.name }}</strong>?</p>
-        <form method="POST" action="{% url 'delete_hostel_owner' owner.id %}">
-            {% csrf_token %}
-            <button type="submit">Yes, Delete</button>
-            <a href="{% url 'manage_hostel_owners' %}" class="back-link">Cancel</a>
-        </form>
-    </div>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Delete Hostel Owner</h2>
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<div class="confirmation-box">
+    <p>Are you sure you want to delete the hostel owner: <strong>{{ owner.name }}</strong>?</p>
+    <p class="warning">This action cannot be undone.</p>
+    
+    <form method="POST" action="{% url 'delete_hostel_owner' owner.id %}">
+        {% csrf_token %}
+        <div class="action-buttons">
+            <button type="submit" class="btn delete-button">Yes, Delete</button>
+            <a href="{% url 'manage_hostel_owners' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

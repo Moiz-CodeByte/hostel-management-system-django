@@ -1,11 +1,26 @@
-<h1>Your Hostels</h1>
-<ul>
-    {% for hostel in hostels %}
-        <li>
-            {{ hostel.name }} ({{ hostel.location }}) - 
-            <a href="{% url 'edit_hostel_user' hostel.id %}">Edit</a>
-        </li>
-    {% empty %}
-        <li>You have no hostels. <a href="{% url 'create_hostel' %}">Create one</a></li>
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Your Hostels</h2>
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
     {% endfor %}
 </ul>
+{% endif %}
+
+<div class="section-container">
+    <ul class="hostel-list">
+        {% for hostel in hostels %}
+            <li>
+                {{ hostel.name }} ({{ hostel.location }}) - 
+                <a href="{% url 'edit_hostel_user' hostel.id %}" class="action-link">Edit</a>
+            </li>
+        {% empty %}
+            <li>You have no hostels. <a href="{% url 'create_hostel' %}" class="btn">Create one</a></li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

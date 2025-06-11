@@ -1,84 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Edit Payment - Admin</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f7f9fc;
-            margin: 0; padding: 0;
-            color: #333;
-        }
-        .container {
-            max-width: 600px;
-            margin: 3rem auto;
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
-        }
-        h2 {
-            text-align: center;
-            color: #2a3f54;
-        }
-        form div {
-            margin-bottom: 1.25rem;
-        }
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        input[type="text"], input[type="number"], select {
-            width: 100%;
-            padding: 0.5rem 0.75rem;
-            border: 1.5px solid #ccc;
-            border-radius: 6px;
-        }
-        button[type="submit"] {
-            width: 100%;
-            padding: 0.75rem;
-            background-color: #2a3f54;
-            border: none;
-            border-radius: 25px;
-            color: white;
-            font-size: 1.1rem;
-            cursor: pointer;
-        }
-        @media (max-width: 480px) {
-            .container {
-                margin: 1rem;
-                padding: 1.25rem;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Edit Payment</h2>
-        <form method="POST" action="{% url 'edit_payment' payment.id %}">
-            {% csrf_token %}
-            <div>
-                <label for="paymentAmount">Amount</label>
-                <input type="number" id="paymentAmount" name="amount" value="{{ payment.amount }}" required />
-            </div>
-            <div>
-                <label for="paymentDate">Date</label>
-                <input type="date" id="paymentDate" name="date" value="{{ payment.date }}" required />
-            </div>
-            <div>
-                <label for="paymentHostel">Hostel</label>
-                <select id="paymentHostel" name="hostel" required>
-                    {% for hostel in hostels %}
-                    <option value="{{ hostel.id }}" {% if hostel.id == payment.hostel.id %}selected{% endif %}>{{ hostel.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <button type="submit">Update Payment</button>
-        </form>
-        <a href="{% url 'manage_payments' %}">Back to Manage Payments</a>
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Edit Payment</h2>
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<form method="POST" action="{% url 'edit_payment' payment.id %}">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="paymentAmount">Amount</label>
+        <input type="number" id="paymentAmount" name="amount" value="{{ payment.amount }}" required>
     </div>
-</body>
-</html>
+    <div class="form-group">
+        <label for="paymentDate">Date</label>
+        <input type="date" id="paymentDate" name="date" value="{{ payment.date }}" required>
+    </div>
+    <div class="form-group">
+        <label for="paymentHostel">Hostel</label>
+        <select id="paymentHostel" name="hostel" required>
+            {% for hostel in hostels %}
+            <option value="{{ hostel.id }}" {% if hostel.id == payment.hostel.id %}selected{% endif %}>{{ hostel.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn">Update Payment</button>
+</form>
+<a href="{% url 'manage_payments' %}" class="btn btn-secondary">Back to Manage Payments</a>
+{% endblock %}
