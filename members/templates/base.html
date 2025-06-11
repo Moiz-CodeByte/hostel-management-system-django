@@ -1,0 +1,38 @@
+<!-- base.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hostel Management</title>
+    <link rel="stylesheet" href="{% static 'css/user_side.css' %}">
+    
+</head>
+<body>
+   
+
+
+    <nav style="background-color:#2a3f54; padding: 1rem; color: white; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+            <strong style="font-size: 1.5rem;">Hostel Management</strong>
+            <a href="{% url 'create_student' %}" style="margin-left: 2rem; color: white;">Add students</a>
+            <a href="{% url 'manage_students' %}" style="margin-left: 2rem; color: white;">Students Records</a>
+            <a href="{% url 'manage_staff' %}" style="margin-left: 1rem; color: white;">Staff Records</a>
+            <a href="{% url 'rent_management' %}" style="margin-left: 1rem; color: white;">Rent Management</a>
+        </div>
+        <div>
+            <a href="{% url 'edit_hostel_user' %}" style="margin-left: 2rem; color: white;">Edit Hostel</a>
+            <a href="{% url 'logout' %}" class="logout-button">Logout</a>
+        </div>
+    </nav>
+    
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer style="background-color: #f0f0f0; padding: 1rem; text-align: center; margin-top: 2rem;">
+        &copy; 2025 Hostel Management System. All Rights Reserved.
+    </footer>
+</body>
+</html>

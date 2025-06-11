@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Add New Student</h2>
+<form method="POST" action="{% url 'create_student' %}">
+    {% csrf_token %}
+    <div>
+        <label for="studentName">Name</label>
+        <input type="text" id="studentName" name="name" required>
+    </div>
+    <div>
+        <label for="studentEmail">Email</label>
+        <input type="email" id="studentEmail" name="email" required>
+    </div>
+    <div>
+        <label for="studentPhone">Phone Number</label>
+        <input type="text" id="studentPhone" name="phone_number" required>
+    </div>
+   
+    <div>
+        <label for="room">Room</label>
+    
+            <select name="room" required>
+            {% for room in rooms %}
+                {% if room.remaining_capacity <= 0 %}
+                    <option value="{{ room.id }}" disabled style="color: grey;">
+                        Room {{ room.room_number }} (Full)
+                    </option>
+                {% else %}
+                    <option value="{{ room.id }}">
+                        Room {{ room.room_number }} ({{ room.remaining_capacity }} spots left)
+                    </option>
+                {% endif %}
+            {% endfor %}
+        </select>
+
+    </div>
+    
+    
+    <div>
+        <label for="is_active">Is Active?</label>
+        <select name="is_active" id="is_active">
+            <option value="True" selected>Yes</option>
+            <option value="False">No</option>
+        </select>
+    </div>
+    <button type="submit">Add Student</button>
+</form>
+{% endblock %}

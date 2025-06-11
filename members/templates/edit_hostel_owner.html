@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Edit Hostel Owner - Admin</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f9fc;
+            margin: 0; padding: 0;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 3rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #2a3f54;
+        }
+        form div {
+            margin-bottom: 1.25rem;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        input[type="text"], input[type="email"], textarea {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1.5px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            resize: vertical;
+        }
+        input[type="text"]:focus, input[type="email"]:focus, textarea:focus {
+            outline: none;
+            border-color: #2a3f54;
+        }
+        select {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1.5px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        button[type="submit"] {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #2a3f54;
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button[type="submit"]:hover {
+            background-color: #1e2f43;
+        }
+        a {
+            display: inline-block;
+            margin-top: 1rem;
+            color: #2a3f54;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 480px) {
+            .container {
+                margin: 1rem;
+                padding: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Edit Hostel Owner</h2>
+        <form method="POST" action="{% url 'edit_hostel_owner' owner.id %}">
+            {% csrf_token %}
+            <div>
+                <label for="ownerName">Name</label>
+                <input type="text" id="ownerName" name="name" value="{{ owner.name }}" required />
+            </div>
+            <div>
+                <label for="ownerEmail">Email</label>
+                <input type="email" id="ownerEmail" name="email" value="{{ owner.email }}" required />
+            </div>
+            <div>
+                <label for="ownerPhone">Phone Number</label>
+                <input type="text" id="ownerPhone" name="phone_number" value="{{ owner.phone_number }}" required />
+            </div>
+            <div>
+                <label for="ownerAddress">Address</label>
+                <textarea id="ownerAddress" name="address" rows="3" required>{{ owner.address }}</textarea>
+            </div>
+            <div>
+                <label for="ownerActive">Is Active?</label>
+                <select id="ownerActive" name="is_active" required>
+                    <option value="True" {% if owner.is_active %}selected{% endif %}>Active</option>
+                    <option value="False" {% if not owner.is_active %}selected{% endif %}>Inactive</option>
+                </select>
+            </div>
+            <button type="submit">Update Hostel Owner</button>
+        </form>
+        <a href="{% url 'manage_hostel_owners' %}">Back to Manage Hostel Owners</a>
+    </div>
+</body>
+</html>

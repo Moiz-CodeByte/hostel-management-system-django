@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Edit Staff Member</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    <div>
+        <label>Name</label>
+        <input type="text" name="name" value="{{ staff.name }}" required>
+    </div>
+    <div>
+        <label>Role</label>
+        <input type="text" name="role" value="{{ staff.role }}" required>
+    </div>
+    <div>
+        <label>Phone Number</label>
+        <input type="text" name="phone_number" value="{{ staff.phone_number }}" required>
+    </div>
+    <div>
+        <label>Email</label>
+        <input type="email" name="email" value="{{ staff.email }}" required>
+    </div>
+    <div>
+        <label>Is Active?</label>
+        <select name="is_active">
+            <option value="True" {% if staff.is_active %}selected{% endif %}>Yes</option>
+            <option value="False" {% if not staff.is_active %}selected{% endif %}>No</option>
+        </select>
+    </div>
+    <button type="submit">Update Staff</button>
+</form>
+{% endblock %}

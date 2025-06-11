@@ -1,0 +1,11 @@
+<h1>Your Hostels</h1>
+<ul>
+    {% for hostel in hostels %}
+        <li>
+            {{ hostel.name }} ({{ hostel.location }}) - 
+            <a href="{% url 'edit_hostel_user' hostel.id %}">Edit</a>
+        </li>
+    {% empty %}
+        <li>You have no hostels. <a href="{% url 'create_hostel' %}">Create one</a></li>
+    {% endfor %}
+</ul>

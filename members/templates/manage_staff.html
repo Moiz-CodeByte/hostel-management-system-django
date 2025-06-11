@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Manage Staff</h2>
+
+<!-- Staff Creation Form -->
+<form method="POST">
+    {% csrf_token %}
+    <div>
+        <label>Name</label>
+        <input type="text" name="name" required>
+    </div>
+    <div>
+        <label>Role</label>
+        <input type="text" name="role" required>
+    </div>
+    <div>
+        <label>Phone Number</label>
+        <input type="text" name="phone_number" required>
+    </div>
+    <div>
+        <label>Email</label>
+        <input type="email" name="email" required>
+    </div>
+    <div>
+        <label>Is Active?</label>
+        <select name="is_active">
+            <option value="True" selected>Yes</option>
+            <option value="False">No</option>
+        </select>
+    </div>
+    <button type="submit">Add Staff</button>
+</form>
+
+
+
+
+<form method="GET" action="{% url 'manage_staff' %}">
+    <input type="text" name="search" placeholder="Search by name, email or role" value="{{ search_query }}" />
+
+    <select name="status">
+        <option value="">All</option>
+        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+        <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+    </select>
+
+    <button type="submit">Search</button>
+</form>
+
+
+<!-- Display Existing Staff -->
+<h3>Staff List</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for staff in staff_members %}
+            <tr>
+                <td>{{ staff.name }}</td>
+                <td>{{ staff.role }}</td>
+                <td>{{ staff.phone_number }}</td>
+                <td>{{ staff.email }}</td>
+                <td>{{ staff.is_active|yesno:"Active,Inactive" }}</td>
+                <td>
+                    <a href="{% url 'edit_staff' staff.id %}">Edit</a>
+                    <a href="{% url 'delete_staff' staff.id %}">Delete</a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="6">No staff members found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

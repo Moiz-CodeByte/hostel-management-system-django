@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Edit Rent Payment</h2>
+<form method="POST">
+    {% csrf_token %}
+    <div>
+        <label>Student</label>
+        <input type="text" value="{{ rent.student.name }}" disabled>
+    </div>
+    <div>
+        <label for="amount">Amount</label>
+        <input type="number" step="0.01" name="amount" value="{{ rent.amount }}" required>
+    </div>
+    <div>
+        <label for="is_paid">Paid?</label>
+        <select name="is_paid">
+            <option value="True" {% if rent.is_paid %}selected{% endif %}>Yes</option>
+            <option value="False" {% if not rent.is_paid %}selected{% endif %}>No</option>
+        </select>
+    </div>
+    <button type="submit">Update</button>
+</form>
+<a href="{% url 'rent_management' %}">Back to Rent List</a>
+{% endblock %}

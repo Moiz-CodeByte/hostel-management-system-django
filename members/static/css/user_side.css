@@ -1,0 +1,168 @@
+/* General Body Styling */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f7f9fc;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+/* Container for the main content */
+.container {
+    max-width: 800px;
+    margin: 3rem auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+/* Title Styling */
+h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #2a3f54;
+}
+
+/* Form Element Styling */
+form div {
+    margin-bottom: 1.25rem;
+}
+
+/* Label Styling */
+label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+/* Input fields and select dropdowns */
+input[type="text"], input[type="email"], input[type="number"], select, textarea {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1.5px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+/* Submit Button Styling */
+button[type="submit"] {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #2a3f54;
+    border: none;
+    border-radius: 25px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 2rem;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 0.75rem;
+    text-align: left;
+}
+
+th {
+    background-color: #2a3f54;
+    color: white;
+}
+
+/* Links Styling */
+a {
+    color: #2a3f54;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Navbar Styling */
+nav {
+    background-color: #2a3f54;
+    padding: 1rem;
+    color: white;
+}
+
+nav a {
+    margin-left: 2rem;
+    color: white;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+/* Footer Styling */
+footer {
+    background-color: #f0f0f0;
+    padding: 1rem;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+/* Mobile Styling for small screens */
+@media (max-width: 480px) {
+    .container {
+        margin: 1rem;
+        padding: 1.25rem;
+    }
+
+    nav {
+        text-align: center;
+    }
+
+    nav a {
+        display: block;
+        margin: 0.5rem 0;
+    }
+}
+
+option.full-room {
+    background-color: #f8d7da;  /* light red/pink */
+    color: #721c24;             /* dark red */
+    font-style: italic;
+}
+
+.logout-button {
+    margin-left: 2rem;
+    padding: 0.5rem 1rem;
+    background-color: #d9534f;
+    border-radius: 6px;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.logout-button:hover {
+    background-color: #c9302c;
+    text-decoration: none;
+}
+
+
+
+.messages {
+    list-style: none;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+}
+
+.messages .error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.messages .success {
+    background-color: #d4edda;
+    color: #155724;
+}

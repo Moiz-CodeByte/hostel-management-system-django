@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Signup</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<div class="container">
+    <h1>Signup Form</h1>
+<!-- 
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %} -->
+
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+                {{ message }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+
+    <form method="POST" action="{% url 'signup' %}">
+        {% csrf_token %}
+
+        <!-- Required for AbstractUser even though email is USERNAME_FIELD -->
+        <input type="text" name="username" placeholder="Username" required />
+
+        <input type="text" name="name" placeholder="Full Name" required />
+
+        <input type="email" name="email" placeholder="example@example.com" required />
+
+        <input type="text" name="phone_number" placeholder="Phone Number" required />
+
+        <input type="text" name="address" placeholder="Hostel Owner Address" />
+
+        <input type="password" name="password" placeholder="Password" required />
+
+        <select name="status">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+        </select>
+
+        <button type="submit">Save Hostel Owner</button>
+    </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Delete Payment - Admin</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f9fc;
+            margin: 0; padding: 0;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h2 {
+            color: #d9534f;
+        }
+        p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+        button {
+            padding: 0.75rem 2rem;
+            background-color: #d9534f;
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+        a {
+            display: inline-block;
+            margin-top: 1rem;
+            color: #2a3f54;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Confirm Delete</h2>
+        <p>Are you sure you want to delete the payment: <strong>{{ payment.id }}</strong>?</p>
+        <form method="POST" action="{% url 'delete_payment' payment.id %}">
+            {% csrf_token %}
+            <button type="submit">Yes, Delete</button>
+            <a href="{% url 'manage_payments' %}">Cancel</a>
+        </form>
+    </div>
+</body>
+</html>

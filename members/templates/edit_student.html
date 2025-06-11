@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        <h2>Edit Student</h2>
+        <form method="POST">
+            {% csrf_token %}
+            {% for message in messages %}
+                <p style="color:green">{{ message }}</p>
+            {% endfor %}
+            
+            <div>
+                <label for="studentName">Student Name</label>
+                <input type="text" id="studentName" name="name" value="{{ student.name }}" required />
+            </div>
+            <div>
+                <label for="studentEmail">Email</label>
+                <input type="email" id="studentEmail" name="email" value="{{ student.email }}" required />
+            </div>
+            <div>
+                <label for="studentPhone">Phone Number</label>
+                <input type="text" id="studentPhone" name="phone_number" value="{{ student.phone_number }}" required />
+            </div>
+            <div>
+                <label for="room">Room</label>
+                <select id="room" name="room">
+                    <option value="">-- Select Room --</option>
+                    {% for room in rooms %}
+                        <option value="{{ room.id }}" {% if student.room and student.room.id == room.id %}selected{% endif %}>Room {{ room.room_number }} ({{ room.students.count }}/3)</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="is_active">Is Active?</label>
+                <select name="is_active" id="is_active">
+                    <option value="True" {% if student.is_active %}selected{% endif %}>Yes</option>
+                    <option value="False" {% if not student.is_active %}selected{% endif %}>No</option>
+                </select>
+            </div>
+            <button type="submit">Update Student</button>
+        </form>
+    </div>
+{% endblock %}
