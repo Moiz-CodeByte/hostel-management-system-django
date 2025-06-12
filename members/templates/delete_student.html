@@ -3,13 +3,7 @@
 {% block content %}
 <h2>Delete Student</h2>
 
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-        <li class="{{ message.tags }}">{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
+ 
 
 <div class="confirmation-box">
     <p>Are you sure you want to delete <strong>{{ student.name }}</strong>?</p>

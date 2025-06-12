@@ -5,7 +5,7 @@ from .views import (
     create_rent, create_student, delete_payment, delete_rent, delete_staff, delete_student, edit_hostel_user, edit_rent, edit_staff, 
     edit_student, logout_view, manage_hostel_owners, edit_hostel_owner, delete_hostel_owner,
     manage_hostels, edit_hostel, delete_hostel, manage_payments, edit_payment, manage_rent,
-    manage_staff, signup, login_view, create_hostel, manage_students, home, about
+    manage_staff, signup, login_view, create_hostel, manage_students, home, about, list_hostels_user
 )
 
 
@@ -51,8 +51,8 @@ urlpatterns = [
     path('rent/edit/<int:rent_id>/', edit_rent, name='edit_rent'),
     path('rent/delete/<int:rent_id>/', delete_rent, name='delete_rent'),
 
-    path('edit-hostel/', edit_hostel_user, name='edit_hostel_user'),
-    
+    path('edit-hostel/<int:hostel_id>/', edit_hostel_user, name='edit_hostel_user'),
+    path('my-hostels/', list_hostels_user, name='list_hostels_user'),
   
     path('logout/', logout_view, name='logout'),
     ]

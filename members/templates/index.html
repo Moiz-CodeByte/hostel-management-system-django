@@ -3,13 +3,7 @@
 {% block content %}
 <h2>Manage Students</h2>
 
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-        <li class="{{ message.tags }}">{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
+ 
 
 <div class="section-container">
     <h3>Add New Student</h3>
@@ -20,7 +14,7 @@
     <!-- Search and Filter Form -->
     <form method="GET" action="{% url 'manage_students' %}" class="search-form">
         <div class="form-group">
-            <input type="text" name="search" placeholder="Search by name or email" value="{{ query }}"/>
+            <input type="text" name="search" placeholder="Search by name or email" value="{{ squery }}"/>
         </div>
         <div class="form-group">
             <select name="status">
@@ -38,9 +32,13 @@
             <tr>
                 <th>ID</th>
                 <th>Name</th>
+                <th>Father Name</th>
                 <th>Email</th>
                 <th>Phone</th>
+                <th>Address</th>
+                <th>Department</th>
                 <th>Room</th>
+                <th>Registration Date</th>
                 <th>Active</th>
                 <th>Actions</th>
             </tr>
@@ -50,8 +48,11 @@
                 <tr>
                     <td>{{ student.id }}</td>
                     <td>{{ student.name }}</td>
+                    <td>{{ student.father_name|default:"N/A" }}</td>
                     <td>{{ student.email }}</td>
                     <td>{{ student.phone_number }}</td>
+                    <td>{{ student.address|default:"N/A"|truncatechars:30 }}</td>
+                    <td>{{ student.department|default:"N/A" }}</td>
                     <td>
                         {% if student.room %}
                             {{ student.room.room_number }}
@@ -59,7 +60,7 @@
                             N/A
                         {% endif %}
                     </td>
-                   
+                    <td>{{ student.registration_date|date:"Y-m-d" }}</td>
                     <td>{{ student.is_active|yesno:"Yes,No" }}</td>
                     <td>
                         <a href="{% url 'edit_student' student.id %}" class="action-link">Edit</a>
@@ -67,7 +68,7 @@
                     </td>
                 </tr>
             {% empty %}
-                <tr><td colspan="7">No students found.</td></tr>
+                <tr><td colspan="11">No students found.</td></tr>
             {% endfor %}
         </tbody>
     </table>

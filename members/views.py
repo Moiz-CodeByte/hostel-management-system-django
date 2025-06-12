@@ -234,7 +234,6 @@ def signup(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        
         if HostelOwner.objects.filter(username=username).exists():
             messages.error(request, 'Username already exists.')
             return redirect('signup')
@@ -242,12 +241,20 @@ def signup(request):
             messages.error(request, 'Email already exists.')
             return redirect('signup')
 
-      
-        owner = HostelOwner(username=username, email=email)
+        # Create new user with empty phone and address
+        owner = HostelOwner(username=username, email=email, phone_number='', address='')
         owner.set_password(password)
         owner.save()
-        messages.success(request, 'Account created successfully. Please log in.')
-        return redirect('create_hostel')
+        
+        # Log the user in automatically
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            messages.success(request, 'Account created successfully. Please create your hostel and complete your profile.')
+            return redirect('create_hostel')
+        else:
+            messages.success(request, 'Account created successfully. Please log in.')
+            return redirect('login')
 
     return render(request, 'signup.html')
 
@@ -266,7 +273,18 @@ def login_view(request):
         if user is not None:
             login(request, user)
             messages.success(request, "Login successful!")
-            return redirect('create_student')  
+            
+            # Check if user has completed their profile
+            if not (user.phone_number and user.address):
+                messages.info(request, "Please complete your profile information.")
+                # Get the first hostel or redirect to create one
+                hostel = Hostel.objects.filter(owner=user).first()
+                if hostel:
+                    return redirect('edit_hostel_user', hostel_id=hostel.id)
+                else:
+                    return redirect('create_hostel')
+            
+            return redirect('list_hostels_user')
         else:
             messages.error(request, "Invalid credentials.")
             return redirect('login')
@@ -292,19 +310,20 @@ def create_hostel(request):
             is_active=is_active
         )
 
-        
-
         for i in range(1, total_rooms + 1):
             Room.objects.create(
                hostel=hostel,
-               room_number=i,  
+               room_number=i,
                capacity=2,
                monthly_price=0,
                is_available=True
-    )
+        )
 
-        messages.success(request, 'Hostel and rooms created successfully!')
-        return redirect('create_student')
+        messages.success(request, 'Hostel created successfully!')
+        
+        # Always redirect to edit hostel to ensure contact information is complete
+        messages.info(request, 'Please complete your profile information.')
+        return redirect('edit_hostel_user', hostel_id=hostel.id)
 
     return render(request, 'create_hostel.html')
 
@@ -356,9 +375,13 @@ def create_student(request):
 
     if request.method == 'POST':
         name = request.POST.get('name')
+        father_name = request.POST.get('father_name')
         email = request.POST.get('email')
         phone_number = request.POST.get('phone_number')
+        address = request.POST.get('address')
+        department = request.POST.get('department')
         room_id = request.POST.get('room')
+        registration_date = request.POST.get('registration_date')
         is_active = request.POST.get('is_active') == 'True'
 
         selected_room = Room.objects.filter(id=room_id, hostel=hostel).first()
@@ -372,14 +395,23 @@ def create_student(request):
             messages.error(request, 'A student with this email already exists.')
             return render(request, 'create_student.html', {'rooms': rooms})
 
-        Student.objects.create(
+        # Create student with new fields
+        student = Student.objects.create(
             hostel=hostel,
             name=name,
+            father_name=father_name,
             email=email,
             phone_number=phone_number,
+            address=address,
+            department=department,
             room=selected_room,
             is_active=is_active
         )
+        
+        # Set registration date if provided
+        if registration_date:
+            student.registration_date = registration_date
+            student.save()
         messages.success(request, 'Student created successfully!')
         return redirect('manage_students')
 
@@ -407,10 +439,19 @@ def edit_student(request, student_id):
             return render(request, 'edit_student.html', {'student': student, 'rooms': rooms})
 
         student.name = request.POST.get('name')
+        student.father_name = request.POST.get('father_name')
         student.email = request.POST.get('email')
         student.phone_number = request.POST.get('phone_number')
+        student.address = request.POST.get('address')
+        student.department = request.POST.get('department')
         student.room = selected_room
         student.is_active = request.POST.get('is_active') == 'True'
+        
+        # Update registration date if provided
+        registration_date = request.POST.get('registration_date')
+        if registration_date:
+            student.registration_date = registration_date
+            
         student.save()
 
         messages.success(request, 'Student updated successfully!')
@@ -462,17 +503,23 @@ def manage_staff(request):
 
     if request.method == 'POST':
         name = request.POST.get('name')
+        father_name = request.POST.get('father_name')
         role = request.POST.get('role')
         phone_number = request.POST.get('phone_number')
         email = request.POST.get('email')
+        address = request.POST.get('address')
+        salary = request.POST.get('salary')
         is_active = request.POST.get('is_active') == 'True'
 
         Staff.objects.create(
             hostel=request.user.hostel_set.first(),
             name=name,
+            father_name=father_name,
             role=role,
             phone_number=phone_number,
             email=email,
+            address=address,
+            salary=salary if salary else None,
             is_active=is_active
         )
         messages.success(request, 'Staff member added successfully!')
@@ -493,9 +540,12 @@ def edit_staff(request, staff_id):
 
     if request.method == 'POST':
         staff.name = request.POST.get('name')
+        staff.father_name = request.POST.get('father_name')
         staff.role = request.POST.get('role')
         staff.phone_number = request.POST.get('phone_number')
         staff.email = request.POST.get('email')
+        staff.address = request.POST.get('address')
+        staff.salary = request.POST.get('salary') if request.POST.get('salary') else None
         staff.is_active = request.POST.get('is_active') == 'True'
         staff.save()
         messages.success(request, 'Staff member updated successfully!')
@@ -556,25 +606,39 @@ def edit_rent(request, rent_id):
 
 
 @login_required
-def edit_hostel_user(request):
-    # Get the first hostel of this owner (or latest, change ordering if needed)
-    hostels = Hostel.objects.filter(owner__id=request.user.id).order_by('id')
+def edit_hostel_user(request, hostel_id=None):
+    # If hostel_id is provided, get that specific hostel
+    # Otherwise, get the first hostel of this owner
+    if hostel_id:
+        hostel = get_object_or_404(Hostel, id=hostel_id, owner=request.user)
+    else:
+        hostels = Hostel.objects.filter(owner=request.user).order_by('id')
+        if not hostels.exists():
+            messages.error(request, "You don't have any hostels to edit.")
+            return redirect('create_hostel')
+        hostel = hostels.first()
 
-    if not hostels.exists():
-        messages.error(request, "You don't have any hostels to edit.")
-        return redirect('create_hostel') 
-
-    hostel = hostels.first()  # pick the first one (you can also pick last)
-
+    # Check if user has completed their profile
+    user_profile_complete = bool(request.user.phone_number and request.user.address)
+    
     if request.method == 'POST':
+        # Get hostel data
         name = request.POST.get('name')
         location = request.POST.get('location')
         total_rooms_str = request.POST.get('total_rooms')
         is_active = request.POST.get('is_active') == 'True'
+        
+        # Get user profile data
+        phone_number = request.POST.get('phone_number')
+        address = request.POST.get('address')
 
-        if not (name and location and total_rooms_str):
+        # Validate required fields
+        if not (name and location and total_rooms_str and phone_number and address):
             messages.error(request, "Please fill in all required fields.")
-            return render(request, 'edit_hostel_user.html', {'hostel': hostel})
+            return render(request, 'edit_hostel_user.html', {
+                'hostel': hostel,
+                'user_profile_complete': user_profile_complete
+            })
 
         try:
             total_rooms = int(total_rooms_str)
@@ -582,7 +646,10 @@ def edit_hostel_user(request):
                 raise ValueError
         except ValueError:
             messages.error(request, "Total rooms must be a positive number.")
-            return render(request, 'edit_hostel_user.html', {'hostel': hostel})
+            return render(request, 'edit_hostel_user.html', {
+                'hostel': hostel,
+                'user_profile_complete': user_profile_complete
+            })
 
         old_total = hostel.total_rooms
 
@@ -592,6 +659,11 @@ def edit_hostel_user(request):
         hostel.is_active = is_active
         hostel.total_rooms = total_rooms
         hostel.save()
+        
+        # Update user profile details
+        request.user.phone_number = phone_number
+        request.user.address = address
+        request.user.save()
 
         if total_rooms > old_total:
             for i in range(old_total + 1, total_rooms + 1):
@@ -605,10 +677,13 @@ def edit_hostel_user(request):
         elif total_rooms < old_total:
             messages.warning(request, "Reducing total rooms does not delete existing rooms automatically.")
 
-        messages.success(request, "Hostel updated successfully!")
-        return redirect('create_student')  
+        messages.success(request, "Hostel and profile updated successfully!")
+        return redirect('list_hostels_user')
 
-    return render(request, 'edit_hostel_user.html', {'hostel': hostel})
+    return render(request, 'edit_hostel_user.html', {
+        'hostel': hostel,
+        'user_profile_complete': user_profile_complete
+    })
 
 
 @login_required
@@ -619,6 +694,17 @@ def delete_rent(request, rent_id):
     return redirect('rent_management')
 
 
+@login_required
+def list_hostels_user(request):
+    hostels = Hostel.objects.filter(owner=request.user)
+    
+    # If user has only one hostel, redirect directly to edit page
+    if hostels.count() == 1:
+        return redirect('edit_hostel_user', hostel_id=hostels.first().id)
+    
+    return render(request, 'list_hostels_user.html', {'hostels': hostels})
+
+
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect('home')

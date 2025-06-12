@@ -75,10 +75,13 @@ class Room(models.Model):
 class Student(models.Model):
     hostel = models.ForeignKey(Hostel, on_delete=models.CASCADE, related_name='students')
     name = models.CharField(max_length=100)
+    father_name = models.CharField(max_length=100, blank=True, null=True)
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=15)
+    address = models.TextField(blank=True, null=True)
+    department = models.CharField(max_length=100, blank=True, null=True)
     room = models.ForeignKey(Room, on_delete=models.SET_NULL, null=True, blank=True, related_name='students')
-    registration_date = models.DateTimeField(auto_now_add=True)
+    registration_date = models.DateField(auto_now_add=True)
     is_active = models.BooleanField(default=True) 
     
     
@@ -98,9 +101,12 @@ class Student(models.Model):
 class Staff(models.Model):
     hostel = models.ForeignKey(Hostel, on_delete=models.CASCADE, related_name='staff')
     name = models.CharField(max_length=100)
+    father_name = models.CharField(max_length=100, blank=True, null=True)
     role = models.CharField(max_length=50)
     phone_number = models.CharField(max_length=15)
     email = models.EmailField(unique=True)
+    address = models.TextField(blank=True, null=True)
+    salary = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     is_active = models.BooleanField(default=True)
     
     def __str__(self):

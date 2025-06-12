@@ -3,13 +3,7 @@
 {% block content %}
 <h2>Manage Hostels</h2>
 
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-        <li class="{{ message.tags }}">{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
+
 
 <div class="section-container">
     <h3>Create New Hostel</h3>
@@ -21,11 +15,9 @@
         </div>
         <div class="form-group">
             <label for="hostelLocation">Location</label>
-            <select id="hostelLocation" name="location" required>
-                <option value="City1">City1</option>
-                <option value="City2">City2</option>
-                <option value="City3">City3</option>
-            </select>
+            <input id="hostelLocation" name="location" type="text" required>
+               
+            
         </div>
         <div class="form-group">
             <label for="totalRooms">Total Rooms</label>

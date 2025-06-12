@@ -1,43 +1,90 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Edit Hostel</h2>
+<h2>{% if user_profile_complete %}Edit Hostel{% else %}Complete Your Profile{% endif %}</h2>
 
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-        <li class="{{ message.tags }}">{{ message }}</li>
-    {% endfor %}
-</ul>
+{% if not user_profile_complete %}
+<div class="alert alert-info">
+    Please complete your profile information to continue.
+</div>
 {% endif %}
 
-<form method="POST" action="{% url 'edit_hostel_user' %}">
+<form method="POST" action="{% url 'edit_hostel_user' hostel.id %}">
     {% csrf_token %}
     
-    <div class="form-group">
-        <label for="hostelName">Hostel Name</label>
-        <input type="text" id="hostelName" name="name" value="{{ hostel.name }}" required>
-    </div>
+    <div class="section-container">
+        <h3>Hostel Information</h3>
+        <div class="form-group">
+            <label for="hostelName">Hostel Name</label>
+            <input type="text" id="hostelName" name="name" value="{{ hostel.name }}" placeholder="Enter hostel name" required class="form-control">
+            <small class="form-text">Enter the official name of your hostel</small>
+        </div>
 
-    <div class="form-group">
-        <label for="hostelLocation">Location</label>
-        <select id="hostelLocation" name="location" required>
-            <option value="" disabled>Select Location</option>
-            <option value="City1" {% if hostel.location == "City1" %}selected{% endif %}>City1</option>
-            <option value="City2" {% if hostel.location == "City2" %}selected{% endif %}>City2</option>
-            <option value="City3" {% if hostel.location == "City3" %}selected{% endif %}>City3</option>
-        </select>
-    </div>
+        <div class="form-group">
+            <label for="hostelLocation">Location of Hostel</label>
+            <input type="text" id="hostelLocation" name="location" value="{{hostel.location}}" placeholder="Enter hostel location" required class="form-control">
+            <small class="form-text">Specify the exact location of your hostel</small>
+        </div>
 
-    <div class="form-group">
-        <label for="totalRooms">Total Rooms</label>
-        <input type="number" id="totalRooms" name="total_rooms" min="1" value="{{ hostel.total_rooms }}" required>
-        <small class="warning">Warning: Reducing the number of rooms may affect existing room assignments.</small>
+        <div class="form-group">
+            <label for="totalRooms">Total Rooms</label>
+            <input type="number" id="totalRooms" name="total_rooms" min="1" value="{{ hostel.total_rooms }}" placeholder="Enter total number of rooms" required class="form-control">
+            <small class="form-text">Specify the total number of rooms in your hostel</small>
+        </div>
     </div>
+    
+    <div class="section-container contact-info">
+        <h3>Your Contact Information</h3>
+        <div class="form-group">
+            <label for="phoneNumber">Phone Number</label>
+            <input type="tel" id="phoneNumber" name="phone_number" value="{{ request.user.phone_number }}" placeholder="Enter your phone number" required class="form-control">
+            <small class="form-text">Enter a valid phone number where students can contact you</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="address">Address</label>
+            <textarea id="address" name="address" rows="3" placeholder="Enter your full address" required class="form-control">{{ request.user.address }}</textarea>
+            <small class="form-text">Provide your complete address for official correspondence</small>
+        </div>
+    </div>
+    
+    <style>
+        .contact-info {
+            background-color: #f8f9fa;
+            border-left: 4px solid #2a3f54;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .form-control {
+            display: block;
+            width: 100%;
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #495057;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        .form-control:focus {
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        .form-text {
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+    </style>
 
     <input type="hidden" name="is_active" value="True">
 
-    <button type="submit" class="btn">Update Hostel</button>
-    <a href="{% url 'list_hostels_user' %}" class="btn btn-secondary">Back to My Hostels</a>
+    <button type="submit" class="btn">{% if user_profile_complete %}Update Information{% else %}Complete Profile{% endif %}</button>
+    {% if user_profile_complete %}
+    <a href="{% url 'list_hostels_user' %}" class="btn btn-secondary">Back</a>
+    {% endif %}
 </form>
 {% endblock %}

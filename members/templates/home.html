@@ -1,22 +1,15 @@
-<!-- home.html -->
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Hostel Management</title>
-    <link rel="stylesheet" href="{% static 'css/user_side.css' %}">
+
+{% block content %}
     <style>
-        body {
-            background-color: #f4f6f9;
+        .home-container {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            flex: 1;
+            padding: 2rem 0;
         }
 
         .welcome-container {
@@ -97,63 +90,41 @@
             margin-bottom: 1rem;
             display: block;
         }
-
+        
         .feature h3 {
             color: #2a3f54;
             margin-bottom: 0.5rem;
         }
-
-        .nav-links {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-        }
-
-        .nav-links a {
-            color: #2a3f54;
-            margin-left: 15px;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .nav-links a:hover {
-            text-decoration: underline;
-        }
     </style>
-</head>
-<body>
-    <div class="nav-links">
-        <a href="{% url 'home' %}">Home</a>
-        <a href="{% url 'about' %}">About</a>
-        <a href="{% url 'login' %}">Login</a>
-        <a href="{% url 'signup' %}">Sign Up</a>
+
+
+    <div class="home-container">
+        <div class="welcome-container">
+            <h1>Welcome to Hostel Management System</h1>
+            <p>A comprehensive solution for managing your hostels, students, staff, and finances with ease and efficiency.</p>
+            
+            <div class="features">
+                <div class="feature">
+                    <span class="feature-icon">🏢</span>
+                    <h3>Hostel Management</h3>
+                    <p>Manage multiple hostels and rooms efficiently</p>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">👨‍🎓</span>
+                    <h3>Student Records</h3>
+                    <p>Keep track of all student information</p>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">💰</span>
+                    <h3>Rent Collection</h3>
+                    <p>Track payments and financial records</p>
+                </div>
+            </div>
+            
+            <a href="{% url 'login' %}" class="btn">Login</a>
+            <a href="{% url 'signup' %}" class="btn">Sign Up</a>
+            <a href="{% url 'about' %}" class="btn btn-outline">Learn More</a>
+        </div>
     </div>
 
-    <div class="welcome-container">
-        <h1>Welcome to Hostel Management System</h1>
-        <p>A comprehensive solution for managing your hostels, students, staff, and finances with ease and efficiency.</p>
-        
-        <div class="features">
-            <div class="feature">
-                <span class="feature-icon">🏢</span>
-                <h3>Hostel Management</h3>
-                <p>Manage multiple hostels and rooms efficiently</p>
-            </div>
-            <div class="feature">
-                <span class="feature-icon">👨‍🎓</span>
-                <h3>Student Records</h3>
-                <p>Keep track of all student information</p>
-            </div>
-            <div class="feature">
-                <span class="feature-icon">💰</span>
-                <h3>Rent Collection</h3>
-                <p>Track payments and financial records</p>
-            </div>
-        </div>
-        
-        <a href="{% url 'login' %}" class="btn">Login</a>
-        <a href="{% url 'signup' %}" class="btn">Sign Up</a>
-        <a href="{% url 'about' %}" class="btn btn-outline">Learn More</a>
-    </div>
-</body>
-</html>
+{% endblock %}

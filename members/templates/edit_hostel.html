@@ -3,13 +3,7 @@
 {% block content %}
 <h2>Edit Hostel</h2>
 
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-        <li class="{{ message.tags }}">{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
+
 
 <form method="POST" action="{% url 'edit_hostel' hostel.id %}">
     {% csrf_token %}
@@ -19,18 +13,14 @@
     </div>
     
     <div class="form-group">
-        <label for="hostelLocation">Location</label>
-        <select id="hostelLocation" name="location" required>
-            <option value="City1" {% if hostel.location == "City1" %}selected{% endif %}>City1</option>
-            <option value="City2" {% if hostel.location == "City2" %}selected{% endif %}>City2</option>
-            <option value="City3" {% if hostel.location == "City3" %}selected{% endif %}>City3</option>
-        </select>
+        <label for="hostelLocation">Location of Hostel</label>
+        <input type="text" id="hostelLocation" name="location" value="{{hostel.location}}" required>
     </div>
     
     <div class="form-group">
         <label for="totalRooms">Total Rooms</label>
-        <input type="number" id="totalRooms" name="total_rooms" value="{{ hostel.totaal_rooms }}" min="1" required>
-        <small class="warning">Warning: Reducing the number of rooms may affect existing room assignments.</small>
+        <input type="number" id="totalRooms" name="total_rooms" value="{{ hostel.total_rooms }}" min="1" required>
+        
     </div>
 
     <div class="form-group">

@@ -3,13 +3,7 @@
 {% block content %}
 <h2>Manage Staff</h2>
 
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-        <li class="{{ message.tags }}">{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
+ 
 
 <div class="section-container">
     <div class="section-header">
@@ -36,6 +30,21 @@
         <div class="form-group">
             <label for="staffEmail">Email</label>
             <input type="email" id="staffEmail" name="email" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="fatherName">Father Name</label>
+            <input type="text" id="fatherName" name="father_name">
+        </div>
+        
+        <div class="form-group">
+            <label for="address">Address</label>
+            <textarea id="address" name="address" rows="3"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="salary">Salary</label>
+            <input type="number" id="salary" name="salary" step="0.01">
         </div>
         
         <input type="hidden" name="is_active" value="True">
@@ -72,9 +81,12 @@
         <thead>
             <tr>
                 <th>Name</th>
+                <th>Father Name</th>
                 <th>Role</th>
                 <th>Phone</th>
                 <th>Email</th>
+                <th>Address</th>
+                <th>Salary</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
@@ -83,9 +95,12 @@
             {% for staff in staff_members %}
                 <tr>
                     <td>{{ staff.name }}</td>
+                    <td>{{ staff.father_name }}</td>
                     <td>{{ staff.role }}</td>
                     <td>{{ staff.phone_number }}</td>
                     <td>{{ staff.email }}</td>
+                    <td>{{ staff.address }}</td>
+                    <td>{{ staff.salary }}</td>
                     <td>{{ staff.is_active|yesno:"Active,Inactive" }}</td>
                     <td>
                         <a href="{% url 'edit_staff' staff.id %}" class="action-link">Edit</a>
@@ -93,7 +108,7 @@
                     </td>
                 </tr>
             {% empty %}
-                <tr><td colspan="6">No staff members found.</td></tr>
+                <tr><td colspan="9">No staff members found.</td></tr>
             {% endfor %}
         </tbody>
     </table>

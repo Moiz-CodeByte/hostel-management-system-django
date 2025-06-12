@@ -3,13 +3,7 @@
 {% block content %}
 <h2>Edit Payment</h2>
 
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-        <li class="{{ message.tags }}">{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
+ 
 
 <form method="POST" action="{% url 'edit_payment' payment.id %}">
     {% csrf_token %}
