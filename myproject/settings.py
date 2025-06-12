@@ -185,7 +185,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
-ACCOUNT_EMAIL_VERIFICATION = 'none'  # Change to 'mandatory' in production
+ACCOUNT_EMAIL_VERIFICATION = 'none'  
 
 # # Custom Social Account Adapter
 # SOCIALACCOUNT_ADAPTER = 'members.adapter.CustomSocialAccountAdapter'
