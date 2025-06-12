@@ -231,6 +231,7 @@ def about(request):
 def signup(request):
     if request.method == 'POST':
         username = request.POST.get('username')
+        name = request.POST.get('name')
         email = request.POST.get('email')
         password = request.POST.get('password')
 
@@ -242,7 +243,7 @@ def signup(request):
             return redirect('signup')
 
         # Create new user with empty phone and address
-        owner = HostelOwner(username=username, email=email, phone_number='', address='')
+        owner = HostelOwner(username=username, name=name, email=email, phone_number='', address='')
         owner.set_password(password)
         owner.save()
         
