@@ -38,8 +38,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'members'
-
+    'django.contrib.sites',  # Required for allauth
+    'members',
+    
+    # Django AllAuth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
 
 MIDDLEWARE = [
@@ -50,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'myproject.urls'
@@ -65,6 +72,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.request',  # Required for allauth
             ],
         },
     },
@@ -135,11 +143,52 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 
-LOGIN_URL = '/login/'  # Where Django redirects if @login_required fails
-LOGIN_REDIRECT_URL = '/students/create/'  # Where to go after login
-
+LOGIN_URL = '/login/'  
+LOGIN_REDIRECT_URL = '/my-hostel/'  
+ACCOUNT_LOGOUT_REDIRECT_URL = '/login/'
 
 AUTH_USER_MODEL = 'members.HostelOwner'
+
+# Django AllAuth Configuration
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of allauth
+    'django.contrib.auth.backends.ModelBackend',
+    # allauth specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+# Required for django.contrib.sites
+SITE_ID = 1
+
+# AllAuth Social Account Settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'OAUTH_PKCE_ENABLED': True,
+        
+        'APP': {
+            'client_id': '',  
+            'secret': '',  
+            'key': ''
+        }
+    }
+}
+
+# AllAuth Settings
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+ACCOUNT_EMAIL_VERIFICATION = 'none'  # Change to 'mandatory' in production
+
+# # Custom Social Account Adapter
+# SOCIALACCOUNT_ADAPTER = 'members.adapter.CustomSocialAccountAdapter'
 
 
 

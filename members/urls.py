@@ -52,7 +52,7 @@ urlpatterns = [
     path('rent/delete/<int:rent_id>/', delete_rent, name='delete_rent'),
 
     path('edit-hostel/<int:hostel_id>/', edit_hostel_user, name='edit_hostel_user'),
-    path('my-hostels/', list_hostels_user, name='list_hostels_user'),
+    path('my-hostel/', list_hostels_user, name='list_hostels_user'),
   
     path('logout/', logout_view, name='logout'),
     ]

@@ -265,6 +265,11 @@ def signup(request):
 
 
 def login_view(request):
+    # Check if user is already authenticated via social auth
+    if request.user.is_authenticated and not request.method == 'POST':
+        # User is already logged in via social auth
+        return redirect('list_hostels_user')
+        
     if request.method == 'POST':
         username = request.POST['username'] 
         password = request.POST['password']
