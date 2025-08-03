@@ -5,7 +5,7 @@ from .views import (
     create_rent, create_student, delete_payment, delete_rent, delete_staff, delete_student, edit_hostel_user, edit_rent, edit_staff, 
     edit_student, logout_view, manage_hostel_owners, edit_hostel_owner, delete_hostel_owner,
     manage_hostels, edit_hostel, delete_hostel, manage_payments, edit_payment, manage_rent,
-    manage_staff, signup, login_view, create_hostel, manage_students, home, about, list_hostels_user
+    manage_staff, signup, login_view,create_staff, create_hostel, manage_students, home, about, list_hostels_user, edit_profile
 )
 
 
@@ -32,22 +32,23 @@ urlpatterns = [
     path('login/', login_view, name='login'),
     path('accounts/login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),  # fallback login
     path('create_hostel/', create_hostel, name='create_hostel'),
+    path('edit_profile/', edit_profile, name='edit_profile'),
 
     # Students
-    path('students/', manage_students, name='manage_students'),
-    path('students/create/', create_student, name='create_student'),
+    path('hostel/<int:hostel_id>/students/', manage_students, name='manage_students'),
+    path('hostel/<int:hostel_id>/students/create/', create_student, name='create_student'),
     path('students/edit/<int:student_id>/', edit_student, name='edit_student'),
     path('students/delete/<int:student_id>/', delete_student, name='delete_student'),
 
     # Staff
-    path('staff/', manage_staff, name='manage_staff'),
+    path('hostel/<int:hostel_id>/staff/', manage_staff, name='manage_staff'),
+    path('hostel/<int:hostel_id>/staff/create/', create_staff, name='create_staff'),
     path('staff/edit/<int:staff_id>/', edit_staff, name='edit_staff'),
     path('staff/delete/<int:staff_id>/', delete_staff, name='delete_staff'),
 
-
     # Rent
-    path('rent/', manage_rent, name='rent_management'),
-    path('rent/create/', create_rent, name='create_rent'),
+    path('hostel/<int:hostel_id>/rent/', manage_rent, name='manage_rent'),
+    path('hostel/<int:hostel_id>/rent/create/', create_rent, name='create_rent'),
     path('rent/edit/<int:rent_id>/', edit_rent, name='edit_rent'),
     path('rent/delete/<int:rent_id>/', delete_rent, name='delete_rent'),
 
@@ -55,6 +56,6 @@ urlpatterns = [
     path('my-hostel/', list_hostels_user, name='list_hostels_user'),
   
     path('logout/', logout_view, name='logout'),
-    ]
+]
 
 

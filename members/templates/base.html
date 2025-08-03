@@ -1,99 +1,63 @@
-<!-- base.html -->
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hostel Management</title>
-    <link rel="stylesheet" href="{% static 'css/user_side.css' %}">
+    <title>Hostel Management System</title>
+    {% load static %}
     <link rel="stylesheet" href="{% static 'css/enhanced_style.css' %}">
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 </head>
 <body>
-    <nav>
-        <div>
-            <a href="{% url 'home' %}" style="text-decoration: none; color: inherit;">
-                <strong style="font-size: 1.5rem;">Hostel Management</strong>
-            </a>
-            {% if user.is_authenticated %}
-            <a href="{% url 'create_student' %}">Add Students</a>
-            <a href="{% url 'manage_students' %}">Students Records</a>
-            <a href="{% url 'manage_staff' %}">Staff Records</a>
-            <a href="{% url 'rent_management' %}">Rent Management</a>
-            {% endif%}
-        </div>
-        <div>
-            {% if user.is_authenticated %}
-            <a href="{% url 'list_hostels_user' %}">Edit Hostel</a>
-            {% endif %}
-            <a href="{% url 'about' %}">About</a>
-            {% if user.is_authenticated %}
-            <a href="{% url 'logout' %}" class="logout-button">Logout</a>
-            {% else %}
-            <a href="{% url 'login'%}" class="logout-button">Login</a>
-            <a href="{% url 'signup'%}" class="logout-button">Signup</a>
-            {% endif %}
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="{% url 'home' %}" class="navbar-brand">Hostel Management System</a>
+            <div class="navbar-links">
+                {% if user.is_authenticated %}
+                    {% if user.is_superuser %}
+                        <a href="{% url 'manage_hostel_owners' %}">Manage Hostel Owners</a>
+                        <a href="{% url 'manage_hostels' %}">Manage Hostels</a>
+                        <a href="{% url 'manage_payments' %}">Manage Payments</a>
+                    {% else %}
+                        <a href="{% url 'list_hostels_user' %}">My Hostels</a>
+                        <a href="{% url 'edit_profile' %}">Profile</a>
+                    {% endif %}
+                    <a href="{% url 'logout' %}">Logout</a>
+                {% else %}
+                    <a href="{% url 'home' %}">Home</a>
+                    <a href="{% url 'about' %}">About</a>
+                    <a href="{% url 'login' %}">Login</a>
+                    <a href="{% url 'signup' %}">Sign Up</a>
+                {% endif %}
+            </div>
         </div>
     </nav>
 
     <div class="container">
-        {% block content %}{% endblock %}
+        {% block content %}
+        {% endblock %}
     </div>
 
-    <footer style="background-color: #f0f0f0; padding: 1rem; text-align: center; margin-top: 2rem;">
-        &copy; {% now "Y" %} Hostel Management System. All Rights Reserved.
+    <footer>
+        <div class="container">
+            <p>&copy; {% now "Y" %} Hostel Management System. All rights reserved.</p>
+        </div>
     </footer>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
     <script>
-        // Function to display Toastify notifications
-        function showCToast(type, message) {
-        /* 
-            type: info, success, error, default;
-            message: message to be displayed.
-            */
-            const colorMap = {
-                "info": '#63B3ED',
-                "success": '#2dce89',
-                "error": '#f5365c',
-                "default": "#20c997"
-            };
-        
-            const color = colorMap[type] || colorMap["default"];
-        
-            // Configure and display the toast notification
-            Toastify({
-                text: message,
-                duration: 3000,
-                className: type,
-                close: true,
-                gravity: "top",       // `top` or `bottom`
-                position: "center",   // `left`, `center` or `right`
-                stopOnFocus: true,    // Prevent dismissing of toast on hover
-                style: {
-                    background: color,
-                },
-                escapeMarkup: false,   // Render HTML tags in the notification
-            }).showToast();
-        }
-        
-        // Extract Django messages and display them using Toastify
-        const customMessages = [
+        {% if messages %}
             {% for message in messages %}
-                {
-                    "tags": "{{ message.tags|default:'' }}",
-                    "message": '{{ message.message|default:'' }}'
-                }{% if not forloop.last %},{% endif %}
+                Toastify({
+                    text: "{{ message }}",
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "{% if message.tags == 'success' %}#2ecc71{% elif message.tags == 'error' %}#e74c3c{% elif message.tags == 'warning' %}#f39c12{% else %}#3498db{% endif %}",
+                }).showToast();
             {% endfor %}
-        ];
-        
-        // Display each custom message using Toastify
-        customMessages.forEach(message => {
-            showCToast(message.tags, message.message);
-        });
-        </script>
-
-
+        {% endif %}
+    </script>
 </body>
 </html>

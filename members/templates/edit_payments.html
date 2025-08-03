@@ -3,27 +3,34 @@
 {% block content %}
 <h2>Edit Payment</h2>
 
- 
+<div class="section-container">
+    <div class="section-header">
+        <h3>Payment Details</h3>
+    </div>
 
-<form method="POST" action="{% url 'edit_payment' payment.id %}">
-    {% csrf_token %}
-    <div class="form-group">
-        <label for="paymentAmount">Amount</label>
-        <input type="number" id="paymentAmount" name="amount" value="{{ payment.amount }}" required>
-    </div>
-    <div class="form-group">
-        <label for="paymentDate">Date</label>
-        <input type="date" id="paymentDate" name="date" value="{{ payment.date }}" required>
-    </div>
-    <div class="form-group">
-        <label for="paymentHostel">Hostel</label>
-        <select id="paymentHostel" name="hostel" required>
-            {% for hostel in hostels %}
-            <option value="{{ hostel.id }}" {% if hostel.id == payment.hostel.id %}selected{% endif %}>{{ hostel.name }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    <button type="submit" class="btn">Update Payment</button>
-</form>
-<a href="{% url 'manage_payments' %}" class="btn btn-secondary">Back to Manage Payments</a>
+    <form method="POST" action="{% url 'edit_payment' payment.id %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="paymentAmount">Amount</label>
+            <input type="number" id="paymentAmount" name="amount" value="{{ payment.amount }}" class="form-control" required>
+            <small class="form-text">Enter the payment amount</small>
+        </div>
+        <div class="form-group">
+            <label for="paymentDate">Date</label>
+            <input type="date" id="paymentDate" name="date" value="{{ payment.date }}" class="form-control" required>
+            <small class="form-text">Select the payment date</small>
+        </div>
+        <div class="form-group">
+            <label for="paymentHostel">Hostel</label>
+            <select id="paymentHostel" name="hostel" class="form-control" required>
+                {% for hostel in hostels %}
+                <option value="{{ hostel.id }}" {% if hostel.id == payment.hostel.id %}selected{% endif %}>{{ hostel.name }}</option>
+                {% endfor %}
+            </select>
+            <small class="form-text">Select the hostel for this payment</small>
+        </div>
+        <button type="submit" class="btn">Update Payment</button>
+        <a href="{% url 'manage_payments' %}" class="btn btn-secondary">Back to Manage Payments</a>
+    </form>
+</div>
 {% endblock %}

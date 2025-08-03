@@ -1,37 +1,43 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Edit Hostel Owner</h2>
+<div class="section-container">
+    <div class="section-header">
+        <h2>Edit Hostel Owner</h2>
+    </div>
 
- 
-
-<form method="POST" action="{% url 'edit_hostel_owner' owner.id %}">
-    {% csrf_token %}
-    <div class="form-group">
-        <label for="ownerName">Name</label>
-        <input type="text" id="ownerName" name="name" value="{{ owner.name }}" required>
-    </div>
-    
-    <div class="form-group">
-        <label for="ownerEmail">Email</label>
-        <input type="email" id="ownerEmail" name="email" value="{{ owner.email }}" required>
-    </div>
-    
-    <div class="form-group">
-        <label for="ownerPhone">Phone Number</label>
-        <input type="text" id="ownerPhone" name="phone_number" value="{{ owner.phone_number }}" required>
-    </div>
-    
-    <div class="form-group">
-        <label for="ownerAddress">Address</label>
-        <textarea id="ownerAddress" name="address" rows="3" required>{{ owner.address }}</textarea>
-    </div>
-    
-    <input type="hidden" name="is_active" value="True">
-    
-    <div class="form-actions">
-        <button type="submit" class="btn">Update Hostel Owner</button>
-        <a href="{% url 'manage_hostel_owners' %}" class="btn btn-secondary">Back to Manage Hostel Owners</a>
-    </div>
-</form>
+    <form method="POST" action="{% url 'edit_hostel_owner' owner.id %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="ownerName">Name</label>
+            <input type="text" id="ownerName" name="name" value="{{ owner.name }}" class="form-control" required>
+            <small>Enter the full name of the hostel owner</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="ownerEmail">Email</label>
+            <input type="email" id="ownerEmail" name="email" value="{{ owner.email }}" class="form-control" required>
+            <small>Enter a valid email address for communications</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="ownerPhone">Phone Number</label>
+            <input type="text" id="ownerPhone" name="phone_number" value="{{ owner.phone_number }}" class="form-control" required>
+            <small>Enter a valid phone number for contact</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="ownerAddress">Address</label>
+            <textarea id="ownerAddress" name="address" rows="3" class="form-control" required>{{ owner.address }}</textarea>
+            <small>Provide the complete address for official correspondence</small>
+        </div>
+        
+        <input type="hidden" name="is_active" value="True">
+        
+        <div class="form-actions">
+            <button type="submit" class="btn">Update Hostel Owner</button>
+            <a href="{% url 'manage_hostel_owners' %}" class="btn btn-secondary">Back to Manage Hostel Owners</a>
+        </div>
+    </form>
+</div>
 {% endblock %}

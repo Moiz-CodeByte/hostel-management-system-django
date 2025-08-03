@@ -1,131 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - Hostel Management System</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <link rel="stylesheet" href="{% static 'css/enhanced_style.css' %}">
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f7f9fc;
-            padding: 2rem 0;
-        }
-        
-        .container {
-            max-width: 500px;
-            width: 90%;
-            padding: 2rem;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-            margin: 2rem 0;
-        }
-        
-        h1 {
-            text-align: center;
-            color: #2a3f54;
-            margin-bottom: 2rem;
-        }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: #2a3f54;
-        }
-        
-        input, select {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-        }
-        
-        input:focus, select:focus {
-            border-color: #2a3f54;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(42, 63, 84, 0.1);
-        }
-        
-        select {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%232a3f54' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            padding-right: 2.5rem;
-        }
-        
-        button {
-            width: 100%;
-            padding: 0.75rem;
-            background-color: #2a3f54;
-            border: none;
-            border-radius: 25px;
-            color: white;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 1rem;
-        }
-        
-        button:hover {
-            background-color: #1a2836;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        .login-link {
-            text-align: center;
-            margin-top: 1.5rem;
-        }
-        
-        .login-link a {
-            color: #2a3f54;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        
-        .login-link a:hover {
-            text-decoration: underline;
-        }
-        
-        .home-link {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: #2a3f54;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        
-        .home-link:hover {
-            text-decoration: underline;
-        }
-    </style>
-</head>
-<body>
-    <a href="{% url 'home' %}" class="home-link">← Back to Home</a>
-    
-    <div class="container">
-        <h1>Sign Up</h1>
-        
+{% extends 'base.html' %}
 
+{% block content %}
+<div class="auth-container">
+    <div class="auth-form-container">
+        <h2>Create Your Account</h2>
         
-        <form method="POST" action="{% url 'signup' %}">
+        <form method="POST" action="{% url 'signup' %}" class="auth-form">
             {% csrf_token %}
             
             <div class="form-group">
@@ -134,44 +14,34 @@
             </div>
             
             <div class="form-group">
-                <label for="name">Name</label>
+                <label for="name">Full Name</label>
                 <input type="text" id="name" name="name" required />
             </div>
-            
             
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" required />
             </div>
             
-            <!-- <div class="form-group">
-                <label for="phone_number">Phone Number</label>
-                <input type="text" id="phone_number" name="phone_number" required />
-            </div>
-            
-            <div class="form-group">
-                <label for="address">Address</label>
-                <input type="text" id="address" name="address" />
-            </div> -->
-            
             <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required />
             </div>
             
-            <button type="submit" class="btn">Create Account</button>
+            <button type="submit" class="btn btn-block">Create Account</button>
         </form>
         
-        <div class="login-link">
-            Already have an account? <a href="{% url 'login' %}">Login</a>
+        <div class="auth-links">
+            <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
         </div>
+        
         <div class="social-login">
-            <p style="text-align: center; margin-top: 20px; margin-bottom: 15px;">- OR -</p>
+            <p class="divider">OR</p>
             {% load socialaccount %}
             <a href="{% provider_login_url 'google' %}" class="google-signin-btn">
-                <img src="https://developers.google.com/identity/images/btn_google_signin_dark_normal_web.png" alt="Sign in with Google" style="display: block; margin: 0 auto;">
+                <img src="https://developers.google.com/identity/images/btn_google_signin_dark_normal_web.png" alt="Sign in with Google">
             </a>
         </div>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

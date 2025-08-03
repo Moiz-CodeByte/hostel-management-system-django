@@ -1,50 +1,61 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Edit Staff Member</h2>
+<div class="section-container">
+    <div class="section-header">
+        <h2>Edit Staff Member</h2>
+    </div>
 
- 
-
-<form method="POST">
-    {% csrf_token %}
-    <div class="form-group">
-        <label for="staffName">Name</label>
-        <input type="text" id="staffName" name="name" value="{{ staff.name }}" required>
-    </div>
-    
-    <div class="form-group">
-        <label for="staffRole">Role</label>
-        <input type="text" id="staffRole" name="role" value="{{ staff.role }}" required>
-    </div>
-    
-    <div class="form-group">
-        <label for="staffPhone">Phone Number</label>
-        <input type="text" id="staffPhone" name="phone_number" value="{{ staff.phone_number }}" required>
-    </div>
-    
-    <div class="form-group">
-        <label for="staffEmail">Email</label>
-        <input type="email" id="staffEmail" name="email" value="{{ staff.email }}" required>
-    </div>
-    
-    <div class="form-group">
-        <label for="fatherName">Father Name</label>
-        <input type="text" id="fatherName" name="father_name" value="{{ staff.father_name }}">
-    </div>
-    
-    <div class="form-group">
-        <label for="address">Address</label>
-        <textarea id="address" name="address" rows="3">{{ staff.address }}</textarea>
-    </div>
-    
-    <div class="form-group">
-        <label for="salary">Salary</label>
-        <input type="number" id="salary" name="salary" step="0.01" value="{{ staff.salary }}">
-    </div>
-    
-    <input type="hidden" name="is_active" value="True">
-    
-    <button type="submit" class="btn">Update Staff</button>
-    <a href="{% url 'manage_staff' %}" class="btn btn-secondary">Back</a>
-</form>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="staffName">Name</label>
+            <input type="text" id="staffName" name="name" value="{{ staff.name }}" class="form-control" required>
+            <small>Enter the full name of the staff member</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="staffRole">Role</label>
+            <input type="text" id="staffRole" name="role" value="{{ staff.role }}" class="form-control" required>
+            <small>Specify the role or position of the staff member</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="staffPhone">Phone Number</label>
+            <input type="text" id="staffPhone" name="phone_number" value="{{ staff.phone_number }}" class="form-control" required>
+            <small>Enter a valid phone number for contact</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="staffEmail">Email</label>
+            <input type="email" id="staffEmail" name="email" value="{{ staff.email }}" class="form-control" required>
+            <small>Enter a valid email address for communications</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="fatherName">Father Name</label>
+            <input type="text" id="fatherName" name="father_name" value="{{ staff.father_name }}" class="form-control">
+            <small>Enter the name of the staff member's father</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="address">Address</label>
+            <textarea id="address" name="address" rows="3" class="form-control">{{ staff.address }}</textarea>
+            <small>Provide the complete address for official correspondence</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="salary">Salary</label>
+            <input type="number" id="salary" name="salary" step="0.01" value="{{ staff.salary }}" class="form-control">
+            <small>Enter the monthly salary amount</small>
+        </div>
+        
+        <input type="hidden" name="is_active" value="True">
+        
+        <div class="form-actions">
+            <button type="submit" class="btn">Update Staff</button>
+            <a href="{% url 'manage_staff' hostel.id %}" class="btn btn-secondary">Back</a>
+        </div>
+    </form>
+</div>
 {% endblock %}

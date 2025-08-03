@@ -1,76 +1,64 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Manage Students</h2>
-
- 
-
-<div class="section-container">
-    <h3>Add New Student</h3>
-    <a href="{% url 'create_student' %}" class="btn">Add Student</a>
+<div class="section-header">
+    <h2>Manage Students for {{ hostel.name }}</h2>
+    <div class="action-buttons">
+        <a href="{% url 'create_student' hostel.id %}" class="btn">Add New Student</a>
+    </div>
 </div>
 
-<div class="section-container">
-    <!-- Search and Filter Form -->
-    <form method="GET" action="{% url 'manage_students' %}" class="search-form">
+<div class="search-filter-container">
+    <form method="GET" action="{% url 'manage_students' hostel.id %}" class="search-form">
         <div class="form-group">
-            <input type="text" name="search" placeholder="Search by name or email" value="{{ squery }}"/>
+            <input type="text" name="search" placeholder="Search by name, email or phone" value="{{ request.GET.search }}">
         </div>
         <div class="form-group">
-            <select name="status">
-                <option value="">All</option>
-                <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
-                <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+            <select name="filter_by">
+                <option value="all" {% if request.GET.filter_by == 'all' or not request.GET.filter_by %}selected{% endif %}>All Students</option>
+                <option value="active" {% if request.GET.filter_by == 'active' %}selected{% endif %}>Active Only</option>
+                <option value="inactive" {% if request.GET.filter_by == 'inactive' %}selected{% endif %}>Inactive Only</option>
             </select>
         </div>
-        <button type="submit" class="btn">Search</button>
+        <button type="submit" class="btn">Filter</button>
     </form>
+</div>
 
-    <!-- Display Student Records -->
+<div class="table-container">
     <table class="data-table">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Name</th>
-                <th>Father Name</th>
                 <th>Email</th>
                 <th>Phone</th>
-                <th>Address</th>
-                <th>Department</th>
                 <th>Room</th>
-                <th>Registration Date</th>
-                <th>Active</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for student in students %}
-                <tr>
-                    <td>{{ student.id }}</td>
-                    <td>{{ student.name }}</td>
-                    <td>{{ student.father_name|default:"N/A" }}</td>
-                    <td>{{ student.email }}</td>
-                    <td>{{ student.phone_number }}</td>
-                    <td>{{ student.address|default:"N/A"|truncatechars:30 }}</td>
-                    <td>{{ student.department|default:"N/A" }}</td>
-                    <td>
-                        {% if student.room %}
-                            {{ student.room.room_number }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
-                    <td>{{ student.registration_date|date:"Y-m-d" }}</td>
-                    <td>{{ student.is_active|yesno:"Yes,No" }}</td>
-                    <td>
-                        <a href="{% url 'edit_student' student.id %}" class="action-link">Edit</a>
-                        <a href="{% url 'delete_student' student.id %}" class="action-link delete">Delete</a>
-                    </td>
-                </tr>
+            <tr>
+                <td>{{ student.name }}</td>
+                <td>{{ student.email }}</td>
+                <td>{{ student.phone }}</td>
+                <td>{{ student.room.room_number }}</td>
+                <td>
+                    <a href="{% url 'edit_student' student.id %}" class="action-link">Edit</a>
+                    <a href="{% url 'delete_student' student.id %}" class="action-link delete">Delete</a>
+                </td>
+            </tr>
             {% empty %}
-                <tr><td colspan="11">No students found.</td></tr>
+            <tr>
+                <td colspan="5">No students found.</td>
+            </tr>
             {% endfor %}
         </tbody>
     </table>
+</div>
+
+<div class="dashboard-links">
+    <a href="{% url 'manage_staff' hostel.id %}" class="dashboard-link">Manage Staff</a>
+    <a href="{% url 'manage_rent' hostel.id %}" class="dashboard-link">Manage Rent</a>
+    <a href="{% url 'list_hostels_user' %}" class="dashboard-link">Back to Hostels</a>
 </div>
 {% endblock %}

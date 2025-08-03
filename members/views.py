@@ -1,304 +1,258 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import   Hostel , HostelRentPayment , HostelOwner, RentPayment, Staff ,Student, Hostel, Room
-from django.views.decorators.http import require_http_methods
-from django.urls import reverse
-from django.contrib import messages
-from django.contrib.auth import authenticate, login , logout
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q , Count
+from django.contrib.auth import login, authenticate, logout
+from django.contrib import messages
+from django.contrib.auth.models import User
+from .models import HostelOwner, Hostel, Room, Student, Staff, RentPayment, HostelRentPayment
+from django.db.models import Sum
+from django.utils import timezone
 
-
-
-
-@require_http_methods(["GET", "POST"])
+# Hostel Owner Management
+@login_required
 def manage_hostel_owners(request):
+    if not request.user.is_superuser:
+        messages.error(request, "You don't have permission to access this page.")
+        return redirect('home')
+    
     if request.method == 'POST':
-        
         name = request.POST.get('name')
         email = request.POST.get('email')
-        phone_number = request.POST.get('phone_number')
+        phone = request.POST.get('phone')
         address = request.POST.get('address')
-        is_active_str = request.POST.get('is_active')
-        is_active = True if is_active_str == 'True' else False
+        
+        HostelOwner.objects.create(name=name, email=email, phone=phone, address=address)
+        messages.success(request, 'Hostel Owner created successfully!')
+        return redirect('manage_hostel_owners')
+    
+    owners = HostelOwner.objects.all()
+    return render(request, 'manage_hostel_owners.html', {'owners': owners})
 
-        HostelOwner.objects.create(
-            name=name,
-            email=email,
-            phone_number=phone_number,
-            address=address,
-            is_active=is_active
-        )
-        return redirect('manage_hostel_owners') 
-
-    hostel_owners = HostelOwner.objects.all().order_by('id')
-    context = {
-        'hostel_owners': hostel_owners,
-    }
-    return render(request, 'manage_hostel_owners.html', context)
-
-
-
+@login_required
 def edit_hostel_owner(request, owner_id):
-    owner = get_object_or_404(HostelOwner, pk=owner_id)
+    if not request.user.is_superuser:
+        messages.error(request, "You don't have permission to access this page.")
+        return redirect('home')
+    
+    owner = get_object_or_404(HostelOwner, id=owner_id)
+    
     if request.method == 'POST':
         owner.name = request.POST.get('name')
         owner.email = request.POST.get('email')
-        owner.phone_number = request.POST.get('phone_number')
+        owner.phone = request.POST.get('phone')
         owner.address = request.POST.get('address')
-        is_active_str = request.POST.get('is_active')
-        owner.is_active = True if is_active_str == 'True' else False
         owner.save()
-        return redirect('manage_hostel_owners')  
+        
+        messages.success(request, 'Hostel Owner updated successfully!')
+        return redirect('manage_hostel_owners')
+    
+    return render(request, 'edit_hostel_owner.html', {'owner': owner})
 
-    context = {
-        'owner': owner,
-    }
-    return render(request, 'edit_hostel_owner.html', context)
-
-
-
-
+@login_required
 def delete_hostel_owner(request, owner_id):
-    owner = get_object_or_404(HostelOwner, pk=owner_id)
-    if request.method == "POST":
-        owner.delete()
-        return redirect('manage_hostel_owners') 
+    if not request.user.is_superuser:
+        messages.error(request, "You don't have permission to access this page.")
+        return redirect('home')
+    
+    owner = get_object_or_404(HostelOwner, id=owner_id)
+    owner.delete()
+    
+    messages.success(request, 'Hostel Owner deleted successfully!')
+    return redirect('manage_hostel_owners')
 
-    context = {
-        'owner': owner,
-    }
-    return render(request, 'delete_hostel_owner.html', context)
-
-
-
-
-def get_hostel_owners(request):
-    hostel_owners = HostelOwner.objects.all()
-    context = {
-        'hostel_owners': hostel_owners,
-    }
-    return render(request, 'manage_hostel_owners.html', context)
-
-
-
-
-
-
-
-
-
-@require_http_methods(["GET", "POST"])
+# Hostel Management
+@login_required
 def manage_hostels(request):
+    if not request.user.is_superuser:
+        messages.error(request, "You don't have permission to access this page.")
+        return redirect('home')
+    
     if request.method == 'POST':
         name = request.POST.get('name')
         location = request.POST.get('location')
+        owner_id = request.POST.get('owner')
         total_rooms = request.POST.get('total_rooms')
-        is_active_str = request.POST.get('is_active')
-        is_active = True if is_active_str == 'True' else False
-        owner_id = request.POST.get('owner')  
-       
-        Hostel.objects.create(
-            name=name,
-            location=location,
-            total_rooms=total_rooms,
-            is_active=is_active,
-            owner_id=owner_id  
-        )
+        
+        owner = get_object_or_404(HostelOwner, id=owner_id)
+        hostel = Hostel.objects.create(name=name, location=location, owner=owner, total_rooms=total_rooms)
+        
+        # Create rooms based on total_rooms
+        for i in range(1, int(total_rooms) + 1):
+            Room.objects.create(hostel=hostel, room_number=f"Room {i}", capacity=1)
+        
+        messages.success(request, 'Hostel created successfully!')
         return redirect('manage_hostels')
     
-    hostels = Hostel.objects.all().order_by('id')
-    hostel_owners = HostelOwner.objects.all() 
-    context = {
-        'hostels': hostels,
-        'hostel_owners': hostel_owners
-    }
-    return render(request, 'manage_hostels.html', context)
+    hostels = Hostel.objects.all()
+    owners = HostelOwner.objects.all()
+    return render(request, 'manage_hostels.html', {'hostels': hostels, 'owners': owners})
 
-
-
-
-
-
+@login_required
 def edit_hostel(request, hostel_id):
-    hostel = get_object_or_404(Hostel, pk=hostel_id)
+    if not request.user.is_superuser:
+        messages.error(request, "You don't have permission to access this page.")
+        return redirect('home')
+    
+    hostel = get_object_or_404(Hostel, id=hostel_id)
+    
     if request.method == 'POST':
         hostel.name = request.POST.get('name')
         hostel.location = request.POST.get('location')
-        hostel.total_rooms = request.POST.get('total_rooms')
-        hostel.is_active = request.POST.get('is_active') == 'True'
-        hostel.owner_id = request.POST.get('owner') 
+        owner_id = request.POST.get('owner')
+        new_total_rooms = int(request.POST.get('total_rooms'))
+        
+        hostel.owner = get_object_or_404(HostelOwner, id=owner_id)
+        
+        # Handle total_rooms change
+        current_total_rooms = hostel.total_rooms
+        if new_total_rooms > current_total_rooms:
+            # Create additional rooms
+            for i in range(current_total_rooms + 1, new_total_rooms + 1):
+                Room.objects.create(hostel=hostel, room_number=f"Room {i}", capacity=1)
+        elif new_total_rooms < current_total_rooms:
+            # Check if we can reduce rooms
+            rooms_to_delete = Room.objects.filter(hostel=hostel)[new_total_rooms:]
+            for room in rooms_to_delete:
+                if Student.objects.filter(room=room).exists():
+                    messages.error(request, f"Cannot reduce capacity. Room {room.room_number} is occupied.")
+                    return render(request, 'edit_hostel.html', {'hostel': hostel, 'owners': HostelOwner.objects.all()})
+            
+            # Delete excess rooms
+            rooms_to_delete.delete()
+        
+        hostel.total_rooms = new_total_rooms
         hostel.save()
+        
+        messages.success(request, 'Hostel updated successfully!')
         return redirect('manage_hostels')
-    hostel_owners = HostelOwner.objects.all() 
-    context = {
-        'hostel': hostel,
-        'hostel_owners': hostel_owners,
-    }
-    return render(request, 'edit_hostel.html', context)
+    
+    owners = HostelOwner.objects.all()
+    return render(request, 'edit_hostel.html', {'hostel': hostel, 'owners': owners})
 
-
-
- 
-
+@login_required
 def delete_hostel(request, hostel_id):
-    hostel = get_object_or_404(Hostel, pk=hostel_id)
-    if request.method == "POST":
-        hostel.delete()
-        return redirect('manage_hostels')  
-    context = {
-        'hostel': hostel,
-    }
-    return render(request, 'delete_hostel.html', context)
+    if not request.user.is_superuser:
+        messages.error(request, "You don't have permission to access this page.")
+        return redirect('home')
+    
+    hostel = get_object_or_404(Hostel, id=hostel_id)
+    
+    # Check if there are students in this hostel
+    if Student.objects.filter(room__hostel=hostel).exists():
+        messages.error(request, "Cannot delete hostel with students. Please remove students first.")
+        return redirect('manage_hostels')
+    
+    hostel.delete()
+    messages.success(request, 'Hostel deleted successfully!')
+    return redirect('manage_hostels')
 
-
-
-
-@require_http_methods(["GET", "POST"])
+# Payment Management
+@login_required
 def manage_payments(request):
-
+    if not request.user.is_superuser:
+        messages.error(request, "You don't have permission to access this page.")
+        return redirect('home')
+    
     if request.method == 'POST':
         hostel_id = request.POST.get('hostel')
         amount = request.POST.get('amount')
-        due_date = request.POST.get('due_date')
         payment_date = request.POST.get('payment_date')
-        is_paid = request.POST.get('is_paid') == 'True'
         
-        HostelRentPayment.objects.create(
-            hostel_id=hostel_id,
-            amount=amount,
-            due_date=due_date,
-            payment_date=payment_date,
-            is_paid=is_paid
-        )
+        hostel = get_object_or_404(Hostel, id=hostel_id)
+        HostelRentPayment.objects.create(hostel=hostel, amount=amount, payment_date=payment_date)
+        
+        messages.success(request, 'Payment recorded successfully!')
         return redirect('manage_payments')
     
-    payments = HostelRentPayment.objects.all().order_by('due_date')
-    hostels = Hostel.objects.all()  
-    context = {
-        'payments': payments,
-        'hostels': hostels
-    }
-    return render(request, 'manage_payments.html', context)
+    payments = HostelRentPayment.objects.all().order_by('-payment_date')
+    hostels = Hostel.objects.all()
+    return render(request, 'manage_payments.html', {'payments': payments, 'hostels': hostels})
 
-
+@login_required
 def edit_payment(request, payment_id):
-    payment = get_object_or_404( HostelRentPayment, pk=payment_id)
-    if request.method == 'POST':
-        payment.amount = request.POST.get('amount')
-        payment.date = request.POST.get('date')
-        payment.hostel_id = request.POST.get('hostel')  
-        payment.save()
-        return redirect(reverse('manage_payments'))
+    if not request.user.is_superuser:
+        messages.error(request, "You don't have permission to access this page.")
+        return redirect('home')
     
-    hostels = Hostel.objects.all() 
-    context = {
-        'payment': payment,
-        'hostels': hostels,
-    }
-    return render(request, 'edit_payments.html', context)
+    payment = get_object_or_404(HostelRentPayment, id=payment_id)
+    
+    if request.method == 'POST':
+        hostel_id = request.POST.get('hostel')
+        amount = request.POST.get('amount')
+        payment_date = request.POST.get('payment_date')
+        
+        payment.hostel = get_object_or_404(Hostel, id=hostel_id)
+        payment.amount = amount
+        payment.payment_date = payment_date
+        payment.save()
+        
+        messages.success(request, 'Payment updated successfully!')
+        return redirect('manage_payments')
+    
+    hostels = Hostel.objects.all()
+    return render(request, 'edit_payment.html', {'payment': payment, 'hostels': hostels})
 
-
-
+@login_required
 def delete_payment(request, payment_id):
-    payment = get_object_or_404(HostelRentPayment, pk=payment_id)
-    if request.method == "POST":
-        payment.delete()
-        return redirect('manage_payments')  
-    context = {
-        'payment': payment,
-    }
-    return render(request, 'delete_payment.html', context)
+    if not request.user.is_superuser:
+        messages.error(request, "You don't have permission to access this page.")
+        return redirect('home')
+    
+    payment = get_object_or_404(HostelRentPayment, id=payment_id)
+    payment.delete()
+    
+    messages.success(request, 'Payment deleted successfully!')
+    return redirect('manage_payments')
 
-
-
-
-
-
-
-
-
-
-def home(request): 
+# Public Pages
+def home(request):
     return render(request, 'home.html')
-
 
 def about(request):
     return render(request, 'about.html')
 
-
-
-
+# Authentication
 def signup(request):
     if request.method == 'POST':
         username = request.POST.get('username')
-        name = request.POST.get('name')
         email = request.POST.get('email')
         password = request.POST.get('password')
-
-        if HostelOwner.objects.filter(username=username).exists():
-            messages.error(request, 'Username already exists.')
-            return redirect('signup')
-        if HostelOwner.objects.filter(email=email).exists():
-            messages.error(request, 'Email already exists.')
-            return redirect('signup')
-
-        # Create new user with empty phone and address
-        owner = HostelOwner(username=username, name=name, email=email, phone_number='', address='')
-        owner.set_password(password)
-        owner.save()
+        confirm_password = request.POST.get('confirm_password')
         
-        # Log the user in automatically
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            messages.success(request, 'Account created successfully. Please create your hostel and complete your profile.')
-            return redirect('create_hostel')
-        else:
-            messages.success(request, 'Account created successfully. Please log in.')
-            return redirect('login')
-
+        if password != confirm_password:
+            messages.error(request, "Passwords don't match!")
+            return redirect('signup')
+        
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists!")
+            return redirect('signup')
+        
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Email already exists!")
+            return redirect('signup')
+        
+        user = User.objects.create_user(username=username, email=email, password=password)
+        login(request, user)
+        
+        messages.success(request, 'Account created successfully!')
+        return redirect('home')
+    
     return render(request, 'signup.html')
 
-
-
-
-
-
 def login_view(request):
-    # Check if user is already authenticated via social auth
-    if request.user.is_authenticated and not request.method == 'POST':
-        # User is already logged in via social auth
-        return redirect('list_hostels_user')
-        
     if request.method == 'POST':
-        username = request.POST['username'] 
-        password = request.POST['password']
-
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        
         user = authenticate(request, username=username, password=password)
-
+        
         if user is not None:
             login(request, user)
-            messages.success(request, "Login successful!")
-            
-            # Check if user has completed their profile
-            if not (user.phone_number and user.address):
-                messages.info(request, "Please complete your profile information.")
-                # Get the first hostel or redirect to create one
-                hostel = Hostel.objects.filter(owner=user).first()
-                if hostel:
-                    return redirect('edit_hostel_user', hostel_id=hostel.id)
-                else:
-                    return redirect('create_hostel')
-            
-            return redirect('list_hostels_user')
+            messages.success(request, 'Logged in successfully!')
+            return redirect('home')
         else:
-            messages.error(request, "Invalid credentials.")
-            return redirect('login')
-
+            messages.error(request, 'Invalid username or password!')
+    
     return render(request, 'login.html')
-
-
-
 
 @login_required
 def create_hostel(request):
@@ -306,411 +260,389 @@ def create_hostel(request):
         name = request.POST.get('name')
         location = request.POST.get('location')
         total_rooms = int(request.POST.get('total_rooms'))
-        is_active = request.POST.get('is_active') == 'True'
-
+        
+        # Create hostel
         hostel = Hostel.objects.create(
-            owner=request.user,
             name=name,
             location=location,
-            total_rooms=total_rooms,  
-            is_active=is_active
+            total_rooms=total_rooms,
+            owner=request.user
         )
-
-        for i in range(1, total_rooms + 1):
-            Room.objects.create(
-               hostel=hostel,
-               room_number=i,
-               capacity=2,
-               monthly_price=0,
-               is_available=True
-        )
-
-        messages.success(request, 'Hostel created successfully!')
         
-        # Always redirect to edit hostel to ensure contact information is complete
-        messages.info(request, 'Please complete your profile information.')
-        return redirect('edit_hostel_user', hostel_id=hostel.id)
-
+        # Create rooms based on total_rooms
+        for i in range(1, total_rooms + 1):
+            Room.objects.create(hostel=hostel, room_number=f"Room {i}", capacity=1)
+        
+        messages.success(request, 'Hostel created successfully!')
+        return redirect('list_hostels_user')
+    
     return render(request, 'create_hostel.html')
 
-
-
-
-
-
-
-
-
-
+# Student Management
 @login_required
-def manage_students(request):
-    hostel = Hostel.objects.filter(owner=request.user).first()
-    students = Student.objects.filter(hostel=hostel)
-
-    query = request.GET.get('search')
-    if query:
-        students = students.filter(name__icontains=query) | students.filter(email__icontains=query)
-
-    status = request.GET.get('status')
-    if status == 'active':
-        students = students.filter(is_active=True)
-    elif status == 'inactive':
-        students = students.filter(is_active=False)
-
+def manage_students(request, hostel_id):
+    hostel = get_object_or_404(Hostel, id=hostel_id)
+    
+    # Check if user is authorized to manage this hostel
+    if not request.user.is_superuser and hostel.owner != request.user:
+        messages.error(request, "You don't have permission to access this hostel.")
+        return redirect('home')
+    
+    students = Student.objects.filter(room__hostel=hostel)
+    rooms = Room.objects.filter(hostel=hostel)
+    
+    # Get available rooms (not full)
+    available_rooms = [room for room in rooms if room.students.count() < room.capacity]
+    
     return render(request, 'index.html', {
         'students': students,
-        'query': query
+        'hostel': hostel,
+        'available_rooms': available_rooms
     })
 
-
-
-
-
-
 @login_required
-def create_student(request):
-    hostel = Hostel.objects.filter(owner=request.user).first()
-
-    rooms = Room.objects.filter(hostel=hostel).annotate(
-        student_count=Count('students')
-    )
-
-    # Add a custom attribute to each room: remaining_capacity
-    for room in rooms:
-        room.remaining_capacity = room.capacity - room.student_count
-
+def create_student(request, hostel_id):
+    hostel = get_object_or_404(Hostel, id=hostel_id)
+    
+    # Check if user is authorized to manage this hostel
+    if not request.user.is_superuser and hostel.owner != request.user:
+        messages.error(request, "You don't have permission to access this hostel.")
+        return redirect('home')
+    
     if request.method == 'POST':
         name = request.POST.get('name')
-        father_name = request.POST.get('father_name')
         email = request.POST.get('email')
-        phone_number = request.POST.get('phone_number')
-        address = request.POST.get('address')
-        department = request.POST.get('department')
+        phone = request.POST.get('phone')
         room_id = request.POST.get('room')
-        registration_date = request.POST.get('registration_date')
-        is_active = request.POST.get('is_active') == 'True'
-
-        selected_room = Room.objects.filter(id=room_id, hostel=hostel).first()
-
-        if selected_room and selected_room.students.count() >= selected_room.capacity:
-            messages.error(request, 'Selected room is full.')
-            return render(request, 'create_student.html', {'rooms': rooms})
-
-    
-        if Student.objects.filter(email=email).exists():
-            messages.error(request, 'A student with this email already exists.')
-            return render(request, 'create_student.html', {'rooms': rooms})
-
-        # Create student with new fields
-        student = Student.objects.create(
-            hostel=hostel,
-            name=name,
-            father_name=father_name,
-            email=email,
-            phone_number=phone_number,
-            address=address,
-            department=department,
-            room=selected_room,
-            is_active=is_active
-        )
         
-        # Set registration date if provided
-        if registration_date:
-            student.registration_date = registration_date
-            student.save()
-        messages.success(request, 'Student created successfully!')
-        return redirect('manage_students')
-
-    return render(request, 'create_student.html', {'rooms': rooms})
-
-
-
-
-
-
+        # Check if email is unique
+        if Student.objects.filter(email=email).exists():
+            messages.error(request, "A student with this email already exists!")
+            return redirect('manage_students', hostel_id=hostel.id)
+        
+        room = get_object_or_404(Room, id=room_id)
+        
+        # Check if room is full
+        if room.students.count() >= room.capacity:
+            messages.error(request, "This room is already full!")
+            return redirect('manage_students', hostel_id=hostel.id)
+        
+        Student.objects.create(name=name, email=email, phone=phone, room=room)
+        messages.success(request, 'Student added successfully!')
+        return redirect('manage_students', hostel_id=hostel.id)
+    
+    rooms = Room.objects.filter(hostel=hostel)
+    available_rooms = [room for room in rooms if room.students.count() < room.capacity]
+    
+    return render(request, 'create_student.html', {
+        'hostel': hostel,
+        'available_rooms': available_rooms
+    })
 
 @login_required
 def edit_student(request, student_id):
-    hostel = Hostel.objects.filter(owner=request.user).first()
-    student = get_object_or_404(Student, id=student_id, hostel=hostel)
-    rooms = Room.objects.filter(hostel=hostel)
-
+    student = get_object_or_404(Student, id=student_id)
+    hostel = student.room.hostel
+    
+    # Check if user is authorized to manage this hostel
+    if not request.user.is_superuser and hostel.owner != request.user:
+        messages.error(request, "You don't have permission to access this hostel.")
+        return redirect('home')
+    
     if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
         room_id = request.POST.get('room')
-        selected_room = Room.objects.filter(id=room_id, hostel=hostel).first() if room_id else None
-
-        # If room changed and new room is full
-        if selected_room and selected_room != student.room and selected_room.students.count() >= selected_room.capacity:
-            messages.error(request, 'Selected room is full.')
-            return render(request, 'edit_student.html', {'student': student, 'rooms': rooms})
-
-        student.name = request.POST.get('name')
-        student.father_name = request.POST.get('father_name')
-        student.email = request.POST.get('email')
-        student.phone_number = request.POST.get('phone_number')
-        student.address = request.POST.get('address')
-        student.department = request.POST.get('department')
-        student.room = selected_room
-        student.is_active = request.POST.get('is_active') == 'True'
         
-        # Update registration date if provided
-        registration_date = request.POST.get('registration_date')
-        if registration_date:
-            student.registration_date = registration_date
-            
+        # Check if email is unique (excluding this student)
+        if Student.objects.filter(email=email).exclude(id=student_id).exists():
+            messages.error(request, "A student with this email already exists!")
+            return redirect('edit_student', student_id=student.id)
+        
+        room = get_object_or_404(Room, id=room_id)
+        
+        # Check if room is full (excluding this student)
+        if room.id != student.room.id and room.students.count() >= room.capacity:
+            messages.error(request, "This room is already full!")
+            return redirect('edit_student', student_id=student.id)
+        
+        student.name = name
+        student.email = email
+        student.phone = phone
+        student.room = room
         student.save()
-
+        
         messages.success(request, 'Student updated successfully!')
-        return redirect('manage_students')
-
-    return render(request, 'edit_student.html', {'student': student, 'rooms': rooms})
-
+        return redirect('manage_students', hostel_id=hostel.id)
+    
+    rooms = Room.objects.filter(hostel=hostel)
+    available_rooms = [room for room in rooms if room.students.count() < room.capacity or room.id == student.room.id]
+    
+    return render(request, 'edit_student.html', {
+        'student': student,
+        'hostel': hostel,
+        'available_rooms': available_rooms
+    })
 
 @login_required
 def delete_student(request, student_id):
-    hostel = Hostel.objects.filter(owner=request.user).first()
-    student = get_object_or_404(Student, id=student_id, hostel=hostel)
+    student = get_object_or_404(Student, id=student_id)
+    hostel = student.room.hostel
+    
+    # Check if user is authorized to manage this hostel
+    if not request.user.is_superuser and hostel.user != request.user:
+        messages.error(request, "You don't have permission to access this hostel.")
+        return redirect('home')
+    
+    student.delete()
+    messages.success(request, 'Student deleted successfully!')
+    return redirect('manage_students', hostel_id=hostel.id)
 
-    if request.method == 'POST':
-        student.delete()
-        messages.success(request, 'Student deleted successfully.')
-        return redirect('manage_students')
-
-    return render(request, 'delete_student.html', {'student': student})
-
-
-
-
-
-
-
-
-
-
+# Staff Management
+@login_required
+def manage_staff(request, hostel_id):
+    hostel = get_object_or_404(Hostel, id=hostel_id)
+    
+    # Check if user is authorized to manage this hostel
+    if not request.user.is_superuser and hostel.owner != request.user:
+        messages.error(request, "You don't have permission to access this hostel.")
+        return redirect('home')
+    
+    staff = Staff.objects.filter(hostel=hostel)
+    return render(request, 'staff_management.html', {'staff': staff, 'hostel': hostel})
 
 @login_required
-def manage_staff(request):
-    search_query = request.GET.get('search', '')
-    status_filter = request.GET.get('status', '')
+def create_staff(request, hostel_id):
+    hostel = get_object_or_404(Hostel, id=hostel_id)
     
-    staff_members = Staff.objects.filter(hostel__owner=request.user)
-
-    if search_query:
-        staff_members = staff_members.filter(
-            Q(name__icontains=search_query) |
-            Q(email__icontains=search_query) |
-            Q(role__icontains=search_query)
-        )
-
-    if status_filter == 'active':
-        staff_members = staff_members.filter(is_active=True)
-    elif status_filter == 'inactive':
-        staff_members = staff_members.filter(is_active=False)
-
+    # Check if user is authorized to manage this hostel
+    if not request.user.is_superuser and hostel.owner != request.user:
+        messages.error(request, "You don't have permission to access this hostel.")
+        return redirect('home')
+    
     if request.method == 'POST':
         name = request.POST.get('name')
-        father_name = request.POST.get('father_name')
-        role = request.POST.get('role')
-        phone_number = request.POST.get('phone_number')
-        email = request.POST.get('email')
-        address = request.POST.get('address')
+        position = request.POST.get('position')
+        phone = request.POST.get('phone')
         salary = request.POST.get('salary')
-        is_active = request.POST.get('is_active') == 'True'
-
-        Staff.objects.create(
-            hostel=request.user.hostel_set.first(),
-            name=name,
-            father_name=father_name,
-            role=role,
-            phone_number=phone_number,
-            email=email,
-            address=address,
-            salary=salary if salary else None,
-            is_active=is_active
-        )
+        
+        Staff.objects.create(name=name, position=position, phone=phone, salary=salary, hostel=hostel)
         messages.success(request, 'Staff member added successfully!')
-        return redirect('manage_staff')
-
-    return render(request, 'manage_staff.html', {
-        'staff_members': staff_members,
-        'search_query': search_query,
-        'status_filter': status_filter
-    })
-
-
-
+        return redirect('manage_staff', hostel_id=hostel.id)
+    
+    return render(request, 'create_staff.html', {'hostel': hostel})
 
 @login_required
 def edit_staff(request, staff_id):
-    staff = get_object_or_404(Staff, id=staff_id, hostel__owner=request.user)
-
+    staff = get_object_or_404(Staff, id=staff_id)
+    hostel = staff.hostel
+    
+    # Check if user is authorized to manage this hostel
+    if not request.user.is_superuser and hostel.owner != request.user:
+        messages.error(request, "You don't have permission to access this hostel.")
+        return redirect('home')
+    
     if request.method == 'POST':
-        staff.name = request.POST.get('name')
-        staff.father_name = request.POST.get('father_name')
-        staff.role = request.POST.get('role')
-        staff.phone_number = request.POST.get('phone_number')
-        staff.email = request.POST.get('email')
-        staff.address = request.POST.get('address')
-        staff.salary = request.POST.get('salary') if request.POST.get('salary') else None
-        staff.is_active = request.POST.get('is_active') == 'True'
+        name = request.POST.get('name')
+        position = request.POST.get('position')
+        phone = request.POST.get('phone')
+        salary = request.POST.get('salary')
+        
+        staff.name = name
+        staff.position = position
+        staff.phone = phone
+        staff.salary = salary
         staff.save()
+        
         messages.success(request, 'Staff member updated successfully!')
-        return redirect('manage_staff')
-
-    return render(request, 'edit_staff.html', {'staff': staff})
-
-
-
-
+        return redirect('manage_staff', hostel_id=hostel.id)
+    
+    return render(request, 'edit_staff.html', {'staff': staff, 'hostel': hostel})
 
 @login_required
 def delete_staff(request, staff_id):
-    staff = get_object_or_404(Staff, id=staff_id, hostel__owner=request.user)
+    staff = get_object_or_404(Staff, id=staff_id)
+    hostel = staff.hostel
+    
+    # Check if user is authorized to manage this hostel
+    if not request.user.is_superuser and hostel.owner != request.user:
+        messages.error(request, "You don't have permission to access this hostel.")
+        return redirect('home')
+    
+    staff.delete()
+    messages.success(request, 'Staff member deleted successfully!')
+    return redirect('manage_staff', hostel_id=hostel.id)
 
-    if request.method == 'POST':
-        staff.delete()
-        messages.success(request, 'Staff member deleted.')
-        return redirect('manage_staff')
-
-    return render(request, 'delete_staff.html', {'staff': staff})
-
-
-
+# Rent Management
+@login_required
+def manage_rent(request, hostel_id):
+    hostel = get_object_or_404(Hostel, id=hostel_id)
+    
+    # Check if user is authorized to manage this hostel
+    if not request.user.is_superuser and hostel.owner != request.user:
+        messages.error(request, "You don't have permission to access this hostel.")
+        return redirect('home')
+    
+    rent_payments = RentPayment.objects.filter(student__room__hostel=hostel).order_by('-due_date')
+    students = Student.objects.filter(room__hostel=hostel)
+    
+    return render(request, 'rent_management.html', {
+        'rent_payments': rent_payments,
+        'students': students,
+        'hostel': hostel
+    })
 
 @login_required
-def manage_rent(request):
-    students = Student.objects.filter(hostel__owner=request.user)
-    rent_payments = RentPayment.objects.filter(student__hostel__owner=request.user).order_by('-payment_date')
-    return render(request, 'rent_management.html', {'students': students, 'rent_payments': rent_payments})
-
-@login_required
-def create_rent(request):
+def create_rent(request, hostel_id):
+    hostel = get_object_or_404(Hostel, id=hostel_id)
+    
+    # Check if user is authorized to manage this hostel
+    if not request.user.is_superuser and hostel.owner != request.user:
+        messages.error(request, "You don't have permission to access this hostel.")
+        return redirect('home')
+    
     if request.method == 'POST':
         student_id = request.POST.get('student')
         amount = request.POST.get('amount')
+        due_date = request.POST.get('due_date')
         is_paid = request.POST.get('is_paid') == 'True'
-        student = get_object_or_404(Student, id=student_id, hostel__owner=request.user)
-
-        RentPayment.objects.create(student=student, amount=amount, is_paid=is_paid)
-        messages.success(request, 'Rent payment added.')
-    return redirect('rent_management')
+        payment_date = request.POST.get('payment_date') if is_paid else None
+        
+        student = get_object_or_404(Student, id=student_id)
+        
+        # Verify student belongs to this hostel
+        if student.room.hostel.id != hostel.id:
+            messages.error(request, "Invalid student selection!")
+            return redirect('manage_rent', hostel_id=hostel.id)
+        
+        RentPayment.objects.create(
+            student=student,
+            amount=amount,
+            due_date=due_date,
+            is_paid=is_paid,
+            payment_date=payment_date
+        )
+        
+        messages.success(request, 'Rent payment recorded successfully!')
+        return redirect('manage_rent', hostel_id=hostel.id)
+    
+    return redirect('manage_rent', hostel_id=hostel.id)
 
 @login_required
 def edit_rent(request, rent_id):
-    rent = get_object_or_404(RentPayment, id=rent_id, student__hostel__owner=request.user)
+    rent = get_object_or_404(RentPayment, id=rent_id)
+    hostel = rent.student.room.hostel
+    
+    # Check if user is authorized to manage this hostel
+    if not request.user.is_superuser and hostel.owner != request.user:
+        messages.error(request, "You don't have permission to access this hostel.")
+        return redirect('home')
+    
     if request.method == 'POST':
-        rent.amount = request.POST.get('amount')
-        rent.is_paid = request.POST.get('is_paid') == 'True'
+        student_id = request.POST.get('student')
+        amount = request.POST.get('amount')
+        due_date = request.POST.get('due_date')
+        is_paid = request.POST.get('is_paid') == 'True'
+        payment_date = request.POST.get('payment_date') if is_paid else None
+        
+        student = get_object_or_404(Student, id=student_id)
+        
+        # Verify student belongs to this hostel
+        if student.room.hostel.id != hostel.id:
+            messages.error(request, "Invalid student selection!")
+            return redirect('edit_rent', rent_id=rent.id)
+        
+        rent.student = student
+        rent.amount = amount
+        rent.due_date = due_date
+        rent.is_paid = is_paid
+        rent.payment_date = payment_date
         rent.save()
-        messages.success(request, 'Rent payment updated.')
-        return redirect('rent_management')
-    
-    
-    return render(request, 'edit_rent.html', {'rent': rent})
-
-
-
-
-@login_required
-def edit_hostel_user(request, hostel_id=None):
-    # If hostel_id is provided, get that specific hostel
-    # Otherwise, get the first hostel of this owner
-    if hostel_id:
-        hostel = get_object_or_404(Hostel, id=hostel_id, owner=request.user)
-    else:
-        hostels = Hostel.objects.filter(owner=request.user).order_by('id')
-        if not hostels.exists():
-            messages.error(request, "You don't have any hostels to edit.")
-            return redirect('create_hostel')
-        hostel = hostels.first()
-
-    # Check if user has completed their profile
-    user_profile_complete = bool(request.user.phone_number and request.user.address)
-    
-    if request.method == 'POST':
-        # Get hostel data
-        name = request.POST.get('name')
-        location = request.POST.get('location')
-        total_rooms_str = request.POST.get('total_rooms')
-        is_active = request.POST.get('is_active') == 'True'
         
-        # Get user profile data
-        phone_number = request.POST.get('phone_number')
-        address = request.POST.get('address')
-
-        # Validate required fields
-        if not (name and location and total_rooms_str and phone_number and address):
-            messages.error(request, "Please fill in all required fields.")
-            return render(request, 'edit_hostel_user.html', {
-                'hostel': hostel,
-                'user_profile_complete': user_profile_complete
-            })
-
-        try:
-            total_rooms = int(total_rooms_str)
-            if total_rooms < 1:
-                raise ValueError
-        except ValueError:
-            messages.error(request, "Total rooms must be a positive number.")
-            return render(request, 'edit_hostel_user.html', {
-                'hostel': hostel,
-                'user_profile_complete': user_profile_complete
-            })
-
-        old_total = hostel.total_rooms
-
-        # Update hostel details
-        hostel.name = name
-        hostel.location = location
-        hostel.is_active = is_active
-        hostel.total_rooms = total_rooms
-        hostel.save()
-        
-        # Update user profile details
-        request.user.phone_number = phone_number
-        request.user.address = address
-        request.user.save()
-
-        if total_rooms > old_total:
-            for i in range(old_total + 1, total_rooms + 1):
-                Room.objects.create(
-                    hostel=hostel,
-                    room_number=i,
-                    capacity=2,
-                    monthly_price=0,
-                    is_available=True
-                )
-        elif total_rooms < old_total:
-            messages.warning(request, "Reducing total rooms does not delete existing rooms automatically.")
-
-        messages.success(request, "Hostel and profile updated successfully!")
-        return redirect('list_hostels_user')
-
-    return render(request, 'edit_hostel_user.html', {
-        'hostel': hostel,
-        'user_profile_complete': user_profile_complete
+        messages.success(request, 'Rent payment updated successfully!')
+        return redirect('manage_rent', hostel_id=hostel.id)
+    
+    students = Student.objects.filter(room__hostel=hostel)
+    return render(request, 'edit_rent.html', {
+        'rent': rent,
+        'students': students,
+        'hostel': hostel
     })
 
+@login_required
+def edit_profile(request):
+    if request.method == 'POST':
+        user = request.user
+        user.first_name = request.POST.get('first_name')
+        user.last_name = request.POST.get('last_name')
+        user.email = request.POST.get('email')
+        user.save()
+        
+        messages.success(request, 'Profile updated successfully!')
+        return redirect('home')
+    
+    return render(request, 'edit_profile.html')
+
+@login_required
+def edit_hostel_user(request, hostel_id):
+    hostel = get_object_or_404(Hostel, id=hostel_id)
+    
+    # Check if user is authorized to manage this hostel
+    if hostel.owner != request.user:
+        messages.error(request, "You don't have permission to edit this hostel.")
+        return redirect('home')
+    
+    if request.method == 'POST':
+        hostel.name = request.POST.get('name')
+        hostel.location = request.POST.get('location')
+        new_total_rooms = int(request.POST.get('total_rooms'))
+        
+        # Handle total_rooms change
+        current_total_rooms = hostel.total_rooms
+        if new_total_rooms > current_total_rooms:
+            # Create additional rooms
+            for i in range(current_total_rooms + 1, new_total_rooms + 1):
+                Room.objects.create(hostel=hostel, room_number=f"Room {i}", capacity=1)
+        elif new_total_rooms < current_total_rooms:
+            # Check if we can reduce rooms
+            rooms_to_delete = Room.objects.filter(hostel=hostel)[new_total_rooms:]
+            for room in rooms_to_delete:
+                if Student.objects.filter(room=room).exists():
+                    messages.error(request, f"Cannot reduce capacity. Room {room.room_number} is occupied.")
+                    return render(request, 'edit_hostel_user.html', {'hostel': hostel})
+            
+            # Delete excess rooms
+            rooms_to_delete.delete()
+        
+        hostel.capacity = new_capacity
+        hostel.save()
+        
+        messages.success(request, 'Hostel updated successfully!')
+        return redirect('list_hostels_user')
+    
+    return render(request, 'edit_hostel_user.html', {'hostel': hostel})
 
 @login_required
 def delete_rent(request, rent_id):
-    rent = get_object_or_404(RentPayment, id=rent_id, student__hostel__owner=request.user)
+    rent = get_object_or_404(RentPayment, id=rent_id)
+    hostel = rent.student.room.hostel
+    
+    # Check if user is authorized to manage this hostel
+    if not request.user.is_superuser and hostel.owner != request.user:
+        messages.error(request, "You don't have permission to access this hostel.")
+        return redirect('home')
+    
     rent.delete()
-    messages.success(request, 'Rent payment deleted.')
-    return redirect('rent_management')
-
+    messages.success(request, 'Rent payment deleted successfully!')
+    return redirect('manage_rent', hostel_id=hostel.id)
 
 @login_required
 def list_hostels_user(request):
     hostels = Hostel.objects.filter(owner=request.user)
-    
-    # If user has only one hostel, redirect directly to edit page
-    if hostels.count() == 1:
-        return redirect('edit_hostel_user', hostel_id=hostels.first().id)
-    
     return render(request, 'list_hostels_user.html', {'hostels': hostels})
-
 
 def logout_view(request):
     logout(request)
+    messages.success(request, 'Logged out successfully!')
     return redirect('home')

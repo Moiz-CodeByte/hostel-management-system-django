@@ -1,36 +1,40 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Manage Hostels</h2>
-
-
-
 <div class="section-container">
-    <h3>Create New Hostel</h3>
+    <div class="section-header">
+        <h2>Manage Hostels</h2>
+    </div>
+
+    <div class="section-header">
+        <h3>Create New Hostel</h3>
+    </div>
     <form method="POST" action="{% url 'manage_hostels' %}">
         {% csrf_token %}
         <div class="form-group">
             <label for="hostelName">Hostel Name</label>
-            <input type="text" id="hostelName" name="name" placeholder="Hostel Name" required>
+            <input type="text" id="hostelName" name="name" placeholder="Hostel Name" required class="form-control">
+            <small class="form-text">Enter the name of the hostel</small>
         </div>
         <div class="form-group">
             <label for="hostelLocation">Location</label>
-            <input id="hostelLocation" name="location" type="text" required>
-               
-            
+            <input id="hostelLocation" name="location" type="text" required class="form-control">
+            <small class="form-text">Enter the location of the hostel</small>
         </div>
         <div class="form-group">
             <label for="totalRooms">Total Rooms</label>
-            <input type="number" id="totalRooms" name="total_rooms" min="1" required>
+            <input type="number" id="totalRooms" name="total_rooms" min="1" required class="form-control">
+            <small class="form-text">Enter the total number of rooms in the hostel</small>
         </div>
 
         <div class="form-group">
             <label for="hostelOwner">Owner</label>
-            <select id="hostelOwner" name="owner" required>
+            <select id="hostelOwner" name="owner" required class="form-control">
                 {% for owner in hostel_owners %}
                 <option value="{{ owner.id }}">{{ owner.name }}</option>
                 {% endfor %}
             </select>
+            <small class="form-text">Select the owner of the hostel</small>
         </div>
         
         <input type="hidden" name="is_active" value="True">
@@ -40,7 +44,9 @@
 </div>
 
 <div class="section-container">
-    <h3>Hostels List</h3>
+    <div class="section-header">
+        <h3>Hostels List</h3>
+    </div>
     <table class="data-table">
         <thead>
             <tr>

@@ -1,28 +1,58 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Edit Rent Payment</h2>
+<div class="section-container">
+    <div class="section-header">
+        <h2>Edit Rent Payment</h2>
+    </div>
 
- 
+    <div class="form-section">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Student</label>
+                <input type="text" value="{{ rent.student.name }}" disabled>
+                <small>Student cannot be changed</small>
+            </div>
+            <div class="form-group">
+                <label for="amount">Amount</label>
+                <input type="number" step="0.01" name="amount" id="amount" value="{{ rent.amount }}" required>
+            </div>
+            <div class="form-group">
+                <label for="due_date">Due Date</label>
+                <input type="date" name="due_date" id="due_date" value="{{ rent.due_date|date:'Y-m-d' }}" required>
+            </div>
+            <div class="form-group">
+                <label for="is_paid">Payment Status</label>
+                <select name="is_paid" id="is_paid">
+                    <option value="True" {% if rent.is_paid %}selected{% endif %}>Paid</option>
+                    <option value="False" {% if not rent.is_paid %}selected{% endif %}>Unpaid</option>
+                </select>
+            </div>
+            <div class="form-group" id="payment_date_group">
+                <label for="payment_date">Payment Date</label>
+                <input type="date" name="payment_date" id="payment_date" value="{{ rent.payment_date|date:'Y-m-d' }}">
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn">Update Payment</button>
+                <a href="javascript:history.back()" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
 
-<form method="POST">
-    {% csrf_token %}
-    <div class="form-group">
-        <label>Student</label>
-        <input type="text" value="{{ rent.student.name }}" disabled>
-    </div>
-    <div class="form-group">
-        <label for="amount">Amount</label>
-        <input type="number" step="0.01" name="amount" id="amount" value="{{ rent.amount }}" required>
-    </div>
-    <div class="form-group">
-        <label for="is_paid">Payment Status</label>
-        <select name="is_paid" id="is_paid">
-            <option value="True" {% if rent.is_paid %}selected{% endif %}>Paid</option>
-            <option value="False" {% if not rent.is_paid %}selected{% endif %}>Unpaid</option>
-        </select>
-    </div>
-    <button type="submit" class="btn">Update Payment</button>
-</form>
-<a href="{% url 'rent_management' %}" class="btn btn-secondary">Back to Rent List</a>
+<script>
+    // Show/hide payment date field based on payment status
+    document.getElementById('is_paid').addEventListener('change', function() {
+        var paymentDateGroup = document.getElementById('payment_date_group');
+        if (this.value === 'True') {
+            paymentDateGroup.style.display = 'block';
+        } else {
+            paymentDateGroup.style.display = 'none';
+        }
+    });
+    
+    // Trigger on page load
+    document.getElementById('is_paid').dispatchEvent(new Event('change'));
+</script>
 {% endblock %}

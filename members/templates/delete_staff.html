@@ -1,20 +1,22 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Delete Staff Member</h2>
+<div class="section-container">
+    <div class="section-header">
+        <h2>Delete Staff Member</h2>
+    </div>
 
- 
-
-<div class="confirmation-box">
-    <p>Are you sure you want to delete <strong>{{ staff.name }}</strong> ({{ staff.role }})?</p>
-    <p class="warning">This action cannot be undone.</p>
-    
-    <form method="POST">
-        {% csrf_token %}
-        <div class="action-buttons">
-            <button type="submit" class="btn delete-button">Yes, Delete</button>
-            <a href="{% url 'manage_staff' %}" class="btn btn-secondary">Cancel</a>
-        </div>
-    </form>
+    <div class="confirmation-box">
+        <p>Are you sure you want to delete <strong>{{ staff.name }}</strong> ({{ staff.role }})?</p>
+        <p class="warning">This action cannot be undone.</p>
+        
+        <form method="POST">
+            {% csrf_token %}
+            <div class="action-buttons">
+                <button type="submit" class="btn delete-button">Yes, Delete</button>
+                <a href="{% url 'manage_staff' hostel.id %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}

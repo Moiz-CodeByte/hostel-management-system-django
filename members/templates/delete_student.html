@@ -3,18 +3,22 @@
 {% block content %}
 <h2>Delete Student</h2>
 
- 
+<div class="section-container">
+    <div class="section-header">
+        <h3>Confirm Deletion</h3>
+    </div>
 
-<div class="confirmation-box">
-    <p>Are you sure you want to delete <strong>{{ student.name }}</strong>?</p>
-    <p class="warning">This action cannot be undone.</p>
-    
-    <form method="POST">
-        {% csrf_token %}
-        <div class="action-buttons">
-            <button type="submit" class="btn delete-button">Yes, Delete</button>
-            <a href="{% url 'manage_students' %}" class="btn btn-secondary">Cancel</a>
-        </div>
-    </form>
+    <div class="confirmation-box">
+        <p>Are you sure you want to delete <strong>{{ student.name }}</strong>?</p>
+        <p class="warning">This action cannot be undone.</p>
+        
+        <form method="POST">
+            {% csrf_token %}
+            <div class="action-buttons">
+                <button type="submit" class="btn delete-button">Yes, Delete</button>
+                <a href="{% url 'manage_students' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}

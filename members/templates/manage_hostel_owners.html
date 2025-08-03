@@ -1,29 +1,35 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Manage Hostel Owners</h2>
-
- 
-
 <div class="section-container">
-    <h3>Create New Hostel Owner</h3>
+    <div class="section-header">
+        <h2>Manage Hostel Owners</h2>
+    </div>
+
+    <div class="section-header">
+        <h3>Create New Hostel Owner</h3>
+    </div>
     <form method="POST" action="{% url 'manage_hostel_owners' %}">
         {% csrf_token %}
         <div class="form-group">
             <label for="ownerName">Name</label>
-            <input type="text" id="ownerName" name="name" placeholder="Full Name" required>
+            <input type="text" id="ownerName" name="name" placeholder="Full Name" required class="form-control">
+            <small class="form-text">Enter the full name of the hostel owner</small>
         </div>
         <div class="form-group">
             <label for="ownerEmail">Email</label>
-            <input type="email" id="ownerEmail" name="email" placeholder="example@example.com" required>
+            <input type="email" id="ownerEmail" name="email" placeholder="example@example.com" required class="form-control">
+            <small class="form-text">Enter a valid email address</small>
         </div>
         <div class="form-group">
             <label for="ownerPhone">Phone Number</label>
-            <input type="text" id="ownerPhone" name="phone_number" placeholder="Phone Number" required>
+            <input type="text" id="ownerPhone" name="phone_number" placeholder="Phone Number" required class="form-control">
+            <small class="form-text">Enter a valid phone number</small>
         </div>
         <div class="form-group">
             <label for="ownerAddress">Address</label>
-            <textarea id="ownerAddress" name="address" rows="3" placeholder="Hostel Owner Address" required></textarea>
+            <textarea id="ownerAddress" name="address" rows="3" placeholder="Hostel Owner Address" required class="form-control"></textarea>
+            <small class="form-text">Enter the complete address</small>
         </div>
         
         <input type="hidden" name="is_active" value="True">
@@ -33,7 +39,9 @@
 </div>
 
 <div class="section-container">
-    <h3>Hostel Owners List</h3>
+    <div class="section-header">
+        <h3>Hostel Owners List</h3>
+    </div>
     <table class="data-table">
         <thead>
             <tr>

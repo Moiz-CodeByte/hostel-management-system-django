@@ -1,20 +1,45 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>{{hostel.name}} Hostel</h2>
-
-
-
 <div class="section-container">
-    <ul class="hostel-list">
-        {% for hostel in hostels %}
-            <li>
-                {{ hostel.name }} ({{ hostel.location }}) - 
-                <a href="{% url 'edit_hostel_user' hostel.id %}" class="action-link">Edit</a>
-            </li>
-        {% empty %}
-            <li>You have no hostels. <a href="{% url 'create_hostel' %}" class="btn">Create one</a></li>
-        {% endfor %}
-    </ul>
+    <div class="section-header">
+        <h2>My Hostels</h2>
+        <div class="action-buttons">
+            <a href="{% url 'create_hostel' %}" class="btn">Add New Hostel</a>
+        </div>
+    </div>
+
+    {% if hostels %}
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Hostel Name</th>
+                    <th>Location</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hostel in hostels %}
+                <tr>
+                    <td>{{ hostel.name }}</td>
+                    <td>{{ hostel.location }}</td>
+                    <td>
+                        <a href="{% url 'edit_hostel_user' hostel.id %}" class="action-link">Edit</a>
+                        <a href="{% url 'manage_students' hostel.id %}" class="action-link">Manage Students</a>
+                        <a href="{% url 'manage_staff' hostel.id %}" class="action-link">Manage Staff</a>
+                        <a href="{% url 'manage_rent' hostel.id %}" class="action-link">Manage Rent</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>You don't have any hostels yet.</p>
+        <a href="{% url 'create_hostel' %}" class="btn">Create Your First Hostel</a>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
